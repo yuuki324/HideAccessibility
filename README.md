@@ -7,6 +7,8 @@
 
 **简体中文** | [English](README.en.md)
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 > **这不是上游的官方版本，而是它的衍生作品（Derivative Work）。**
 > 本仓库是 [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility)
 > 的 libxposed API 102 移植版：包名、应用名、版本线都独立，框架层从 legacy Xposed API +

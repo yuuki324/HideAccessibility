@@ -8,6 +8,8 @@ any app you did not select are unaffected.
 
 **English** | [简体中文](README.md)
 
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
+
 > **This is not the upstream project — it is a derivative work of it.** It is a libxposed
 > API 102 port of [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility):
 > the package name, app name and version line are independent, the framework layer was moved
