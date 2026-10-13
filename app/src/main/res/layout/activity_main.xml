@@ -140,7 +140,7 @@
             android:textColor="@color/accent"
             android:textSize="14sp" />
 
-        <!-- 署名：说明这是上游 MIT 项目的移植版，并给出上游地址。
+        <!-- 署名：说明这是上游 GPL-3.0 项目的移植版，并给出上游地址。
              autoLink="web" 让文本里的 URL 可点击。 -->
         <TextView
             android:id="@+id/text_attribution"

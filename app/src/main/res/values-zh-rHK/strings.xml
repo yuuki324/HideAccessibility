@@ -6,7 +6,7 @@
 <resources>
     <string name="app_name">別碰無障礙</string>
     <string name="app_description">令選定的應用程式以為你沒有開啟無障礙功能（libxposed API 102）</string>
-    <string name="about_attribution">本應用程式是上游 MIT 專案 Nitsuya/DoNotTryAccessibility（https://github.com/Nitsuya/DoNotTryAccessibility）的 libxposed API 102 移植版本，上游版權歸原作者所有。</string>
+    <string name="about_attribution">本應用程式是上游 GPL-3.0 專案 Nitsuya/DoNotTryAccessibility（https://github.com/Nitsuya/DoNotTryAccessibility）的 libxposed API 102 移植版本，上游版權歸原作者所有。</string>
 
     <string name="status_checking">正在檢查模組狀態…</string>
     <string name="status_activated">模組已啟用</string>

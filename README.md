@@ -9,7 +9,7 @@ any app you did not select are unaffected.
 **English** | [简体中文](README.zh-CN.md)
 
 > **This is not the upstream project.** It is a libxposed API 102 port of
-> [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility) (MIT):
+> [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility) (GPL-3.0):
 > the package name, app name and version line are independent, and the framework layer was
 > moved from the legacy Xposed API + YukiHookAPI to libxposed API 102.
 > Upstream copyright belongs to the original author.
@@ -107,8 +107,12 @@ adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibil
 
 ## License
 
-Upstream is MIT — see [`LICENSE`](LICENSE). This port keeps the same license;
-upstream copyright belongs to the original author.
+**GPL-3.0** — see [`LICENSE`](LICENSE), which is the upstream project's license kept as-is.
+Upstream copyright belongs to the original author.
 
-Runtime dependencies are all Apache-2.0 (`io.github.libxposed:api` / `service`, Kotlin standard
-library), which is compatible with MIT and carries no copyleft.
+This means the project is **copyleft**: redistributing it, with or without changes, requires
+passing on the same license and making the corresponding source available.
+
+Runtime dependencies are Apache-2.0 (`io.github.libxposed:api` / `service`, Kotlin standard
+library). Apache-2.0 is compatible with GPL-3.0 — the combination may be distributed under
+GPL-3.0, and the Apache-2.0 notices are preserved in each dependency's own `LICENSE`.

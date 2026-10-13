@@ -3,9 +3,9 @@
 <resources>
     <string name="app_name">HideAccessibility</string>
     <string name="app_description">Makes selected apps believe accessibility is off (libxposed API 102)</string>
-    <!-- Attribution: a libxposed API 102 port of Nitsuya/DoNotTryAccessibility (MIT).
+    <!-- Attribution: a libxposed API 102 port of Nitsuya/DoNotTryAccessibility (GPL-3.0).
          Upstream copyright stays with its author. -->
-    <string name="about_attribution">A libxposed API 102 port of the upstream MIT project Nitsuya/DoNotTryAccessibility (https://github.com/Nitsuya/DoNotTryAccessibility). Upstream copyright belongs to the original author.</string>
+    <string name="about_attribution">A libxposed API 102 port of the upstream GPL-3.0 project Nitsuya/DoNotTryAccessibility (https://github.com/Nitsuya/DoNotTryAccessibility). Upstream copyright belongs to the original author.</string>
 
     <string name="status_checking">Checking module status…</string>
     <string name="status_activated">Module is active</string>

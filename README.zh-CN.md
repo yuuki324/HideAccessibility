@@ -8,7 +8,7 @@
 [English](README.md) | **简体中文**
 
 > **这不是上游的官方版本。** 本仓库是
-> [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility)（MIT）
+> [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility)（GPL-3.0）
 > 的 libxposed API 102 移植版：包名、应用名、版本线都独立，框架层从 legacy Xposed API +
 > YukiHookAPI 换成了 libxposed API 102。上游版权归原作者所有。
 
@@ -98,7 +98,12 @@ adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibil
 
 ## 许可
 
-上游为 MIT，见 [`LICENSE`](LICENSE)。本移植版沿用同一许可，上游版权归原作者所有。
+**GPL-3.0** —— 见 [`LICENSE`](LICENSE)。该文件是上游项目的许可证，原样保留，
+上游版权归原作者所有。
 
-运行期依赖均为 Apache-2.0（`io.github.libxposed:api` / `service`、Kotlin 标准库），
-与 MIT 兼容，无 copyleft 传染。
+这意味着本项目是**传染性许可（copyleft）**：再分发（无论是否修改）都必须沿用同一许可，
+并提供对应源码。
+
+运行期依赖为 Apache-2.0（`io.github.libxposed:api` / `service`、Kotlin 标准库）。
+Apache-2.0 与 GPL-3.0 兼容——组合后可整体按 GPL-3.0 分发，各依赖自身的 Apache-2.0 声明
+保留在它自己的 `LICENSE` 中。

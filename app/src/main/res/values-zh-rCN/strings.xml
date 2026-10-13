@@ -2,9 +2,9 @@
 <resources>
     <string name="app_name">别碰无障碍</string>
     <string name="app_description">让被选中的应用以为你没开无障碍（libxposed API 102）</string>
-    <!-- 署名：本模块是上游 Nitsuya/DoNotTryAccessibility（MIT）的 libxposed API 102 移植版。
-         保留出处既是 MIT 的合理期待，也避免被误认成上游作者的新版本。 -->
-    <string name="about_attribution">本应用是上游 MIT 项目 Nitsuya/DoNotTryAccessibility（https://github.com/Nitsuya/DoNotTryAccessibility）的 libxposed API 102 移植版，上游版权归原作者所有。</string>
+    <!-- 署名：本模块是上游 Nitsuya/DoNotTryAccessibility（GPL-3.0）的 libxposed API 102 移植版。
+         保留出处既是 GPL-3.0 的署名要求，也避免被误认成上游作者的新版本。 -->
+    <string name="about_attribution">本应用是上游 GPL-3.0 项目 Nitsuya/DoNotTryAccessibility（https://github.com/Nitsuya/DoNotTryAccessibility）的 libxposed API 102 移植版，上游版权归原作者所有。</string>
 
     <string name="status_checking">正在检测模块状态…</string>
     <string name="status_activated">模块已激活</string>
