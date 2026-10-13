@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 声明本应用支持的语言，供系统设置里的「应用语言」列出。
+     繁體声明 zh-TW 与 zh-HK 两条：资源目录用的是地区限定符（Android 以「语言+地区」
+     精确匹配，不跨地区回退），声明成 zh-Hant 的话系统设置里选中后未必命中 zh-rTW/zh-rHK。 -->
+<locale-config xmlns:android="http://schemas.android.com/apk/res/android">
+    <locale android:name="en" />
+    <locale android:name="zh-CN" />
+    <locale android:name="zh-TW" />
+    <locale android:name="zh-HK" />
+</locale-config>

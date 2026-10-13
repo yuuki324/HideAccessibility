@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 繁體中文。
+     台灣與香港共用同一份譯文（用語取通用繁體寫法），所以 values-zh-rTW 與
+     values-zh-rHK 內容相同——Android 以「語言+地區」精確匹配資源，zh-HK 不會
+     回退到 zh-TW（反之亦然），兩邊都必須是完整鍵集合，缺鍵會掉到預設英文。 -->
+<resources>
+    <string name="app_name">別碰無障礙</string>
+    <string name="app_description">令選定的應用程式以為你沒有開啟無障礙功能（libxposed API 102）</string>
+    <string name="about_attribution">本應用程式是上游 MIT 專案 Nitsuya/DoNotTryAccessibility（https://github.com/Nitsuya/DoNotTryAccessibility）的 libxposed API 102 移植版本，上游版權歸原作者所有。</string>
+
+    <string name="status_checking">正在檢查模組狀態…</string>
+    <string name="status_activated">模組已啟用</string>
+    <string name="status_not_activated">模組未啟用（請在 LSPosed 中啟用本模組，並勾選它建議的適用範圍，然後重新啟動）</string>
+    <string name="status_scope_missing">模組已啟用，但適用範圍內缺少「建議的適用範圍」那一項（名稱因 LSPosed 版本而異，通常顯示為「系統」）</string>
+    <string name="status_framework">運行框架：%1$s %2$s（API %3$d）</string>
+    <string name="status_system">系統版本：%1$s</string>
+    <string name="status_module">模組版本：%1$s</string>
+
+    <string name="button_manage_apps">管理已隱藏的應用程式</string>
+    <string name="switch_hide_icon">隱藏桌面圖示</string>
+    <string name="link_project">專案主頁</string>
+
+    <string name="group_self_check">目前裝置實際狀態（自我檢查用）</string>
+    <string name="label_accessibility_state">AccessibilityManager</string>
+    <string name="label_settings_secure">Settings.Secure</string>
+
+    <!-- Keep the English word in EVERY translation of this label: if the app ever shows
+         a language the user cannot read, "Language" is how they find their way back. -->
+    <string name="label_language">語言 / Language</string>
+    <string name="language_follow_system">跟隨系統 / Follow system</string>
+    <string name="language_unsupported">系統版本低於 Android 13，不支援在應用程式內切換語言</string>
+
+    <string name="title_apps">選擇應用程式</string>
+    <string name="action_back">返回</string>
+    <string name="action_search">搜尋</string>
+    <string name="action_filter">篩選</string>
+    <string name="action_refresh">重新整理</string>
+    <string name="action_export">匯出</string>
+    <string name="action_import">匯入</string>
+    <string name="filter_all">全部</string>
+    <string name="filter_user">使用者應用程式</string>
+    <string name="filter_system">系統應用程式</string>
+    <string name="filter_clear">清除</string>
+    <string name="hint_search">以應用程式名稱或套件名稱搜尋</string>
+    <string name="loading">載入中…</string>
+    <string name="no_data">沒有符合的應用程式</string>
+    <string name="count_result">共 %1$d 個應用程式</string>
+    <string name="hint_selected_first">已選取的應用程式會排在最前</string>
+    <string name="export_success">匯出成功</string>
+    <string name="export_failed">匯出失敗</string>
+    <string name="import_success">匯入成功</string>
+    <string name="import_failed">匯入失敗</string>
+    <string name="blocked_not_delivered">設定通道尚未就緒，變更並未生效（請確認模組已在 LSPosed 中啟用後再試一次）</string>
+    <string name="blocked_toast">已隱藏：%1$s</string>
+    <string name="unblocked_toast">已取消隱藏：%1$s</string>
+    <string name="confirm">確定</string>
+    <string name="cancel">取消</string>
+</resources>

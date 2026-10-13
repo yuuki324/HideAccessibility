@@ -1,0 +1,22 @@
+# Gradle
+.gradle/
+build/
+app/build/
+
+# Android Studio / IntelliJ
+.idea/
+*.iml
+local.properties
+captures/
+
+# Build output committed by mistake
+*.apk
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Keystores other than the bundled debug key
+*.jks
+*.p12
+!app/debug.keystore

@@ -1,0 +1,15 @@
+# Normalize line endings in the repository so the Unix launch script stays runnable.
+* text=auto eol=lf
+
+# Windows batch files must keep CRLF.
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# Binary assets.
+*.jar binary
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.keystore binary
+*.apk binary

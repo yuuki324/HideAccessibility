@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">别碰无障碍</string>
+    <string name="app_description">让被选中的应用以为你没开无障碍（libxposed API 102）</string>
+    <!-- 署名：本模块是上游 Nitsuya/DoNotTryAccessibility（MIT）的 libxposed API 102 移植版。
+         保留出处既是 MIT 的合理期待，也避免被误认成上游作者的新版本。 -->
+    <string name="about_attribution">本应用是上游 MIT 项目 Nitsuya/DoNotTryAccessibility（https://github.com/Nitsuya/DoNotTryAccessibility）的 libxposed API 102 移植版，上游版权归原作者所有。</string>
+
+    <string name="status_checking">正在检测模块状态…</string>
+    <string name="status_activated">模块已激活</string>
+    <string name="status_not_activated">模块未激活（请在 LSPosed 中启用本模块，并勾选它推荐的作用域，然后重启）</string>
+    <string name="status_scope_missing">模块已激活，但作用域里缺少「推荐作用域」那一项（名称随 LSPosed 版本不同，通常显示为「系统」）</string>
+    <string name="status_framework">运行框架：%1$s %2$s（API %3$d）</string>
+    <string name="status_system">系统版本：%1$s</string>
+    <string name="status_module">模块版本：%1$s</string>
+
+    <string name="button_manage_apps">管理被隐藏的应用</string>
+    <string name="switch_hide_icon">隐藏桌面图标</string>
+    <string name="link_project">项目主页</string>
+    <string name="group_self_check">当前设备实际状态（自检用）</string>
+    <string name="label_accessibility_state">AccessibilityManager</string>
+    <string name="label_settings_secure">Settings.Secure</string>
+
+    <!-- Keep the English word in EVERY translation of this label: if the app ever shows
+         a language the user cannot read, "Language" is how they find their way back. -->
+    <string name="label_language">语言 / Language</string>
+    <string name="language_follow_system">跟随系统 / Follow system</string>
+    <string name="language_unsupported">系统版本低于 Android 13，不支持应用内切换语言</string>
+
+    <string name="title_apps">选择应用</string>
+    <string name="action_back">返回</string>
+    <string name="action_search">搜索</string>
+    <string name="action_filter">筛选</string>
+    <string name="action_refresh">刷新</string>
+    <string name="action_export">导出</string>
+    <string name="action_import">导入</string>
+    <string name="filter_all">全部</string>
+    <string name="filter_user">用户应用</string>
+    <string name="filter_system">系统应用</string>
+    <string name="filter_clear">清除</string>
+    <string name="hint_search">按应用名或包名搜索</string>
+    <string name="loading">加载中…</string>
+    <string name="no_data">没有匹配的应用</string>
+    <string name="count_result">共 %1$d 个应用</string>
+    <string name="hint_selected_first">已选中的应用排在前面</string>
+    <string name="export_success">导出成功</string>
+    <string name="export_failed">导出失败</string>
+    <string name="import_success">导入成功</string>
+    <string name="import_failed">导入失败</string>
+    <string name="blocked_not_delivered">配置通道未就绪，改动没有生效（请确认模块已在 LSPosed 中激活后重试）</string>
+    <string name="blocked_toast">已隐藏：%1$s</string>
+    <string name="unblocked_toast">已取消隐藏：%1$s</string>
+    <string name="confirm">确定</string>
+    <string name="cancel">取消</string>
+</resources>

@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <!-- 模块自己的界面需要列出设备上全部应用（被 hook 进程侧不需要该权限） -->
+    <uses-permission
+        android:name="android.permission.QUERY_ALL_PACKAGES"
+        tools:ignore="QueryAllPackagesPermission" />
+
+    <application
+        android:name=".app.ModuleApp"
+        android:allowBackup="true"
+        android:description="@string/app_description"
+        android:icon="@drawable/ic_launcher"
+        android:label="@string/app_name"
+        android:localeConfig="@xml/locales_config"
+        android:supportsRtl="true"
+        android:theme="@style/Theme.App"
+        tools:targetApi="34">
+
+        <!-- 注意：activity-alias 必须排在被引用的 activity 之后。
+             PackageParser 单遍按文档顺序解析，alias 的 targetActivity 只有在
+             之前已解析到同名 activity 时才认，否则整包判为 manifest 畸形。 -->
+        <activity
+            android:name=".ui.MainActivity"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="de.robv.android.xposed.category.MODULE_SETTINGS" />
+            </intent-filter>
+        </activity>
+
+        <activity
+            android:name=".ui.AppsActivity"
+            android:exported="false" />
+
+        <!-- 隐藏桌面图标用；默认禁用，由 MainActivity 的开关控制 -->
+        <activity-alias
+            android:name=".Launcher"
+            android:enabled="true"
+            android:exported="true"
+            android:label="@string/app_name"
+            android:targetActivity=".ui.MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity-alias>
+
+        <!-- 框架把 IXposedService 的 Binder 投递进来的地方。
+             libxposed-service 的 AAR manifest 里本来就声明了这个 provider，
+             authority 是 "${applicationId}.XposedService"；AGP 会自动做 manifest 合并，
+             而本项目走的是手工 aapt2 管线（不做合并），所以必须在这里显式声明，
+             否则框架无处投递 Binder，XposedServiceHelper 永远收不到回调，
+             模块界面会一直显示"未激活 / API 0"（而模块本身在 system_server 里其实是生效的）。 -->
+        <provider
+            android:name="io.github.libxposed.service.XposedProvider"
+            android:authorities="${applicationId}.XposedService"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
+    </application>
+
+</manifest>

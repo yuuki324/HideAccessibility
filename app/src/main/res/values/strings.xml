@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Fallback locale. Keep this file English-only: Chinese lives in values-zh-rCN. -->
+<resources>
+    <string name="app_name">HideAccessibility</string>
+    <string name="app_description">Makes selected apps believe accessibility is off (libxposed API 102)</string>
+    <!-- Attribution: a libxposed API 102 port of Nitsuya/DoNotTryAccessibility (MIT).
+         Upstream copyright stays with its author. -->
+    <string name="about_attribution">A libxposed API 102 port of the upstream MIT project Nitsuya/DoNotTryAccessibility (https://github.com/Nitsuya/DoNotTryAccessibility). Upstream copyright belongs to the original author.</string>
+
+    <string name="status_checking">Checking module status…</string>
+    <string name="status_activated">Module is active</string>
+    <string name="status_not_activated">Module not activated — enable it in LSPosed, tick its recommended scope, then reboot</string>
+    <string name="status_scope_missing">Module is active, but the recommended scope is not ticked (its label differs between LSPosed builds; usually shown as “System”)</string>
+    <string name="status_framework">Framework: %1$s %2$s (API %3$d)</string>
+    <string name="status_system">System: %1$s</string>
+    <string name="status_module">Module version: %1$s</string>
+
+    <string name="button_manage_apps">Manage hidden apps</string>
+    <string name="switch_hide_icon">Hide launcher icon</string>
+    <string name="link_project">Project page</string>
+
+    <string name="group_self_check">Current device state (self-check)</string>
+    <string name="label_accessibility_state">AccessibilityManager</string>
+    <string name="label_settings_secure">Settings.Secure</string>
+
+    <!-- Keep the English word in EVERY translation of this label: if the app ever shows
+         a language the user cannot read, "Language" is how they find their way back. -->
+    <string name="label_language">Language</string>
+    <string name="language_follow_system">Follow system</string>
+    <string name="language_unsupported">In-app language switching needs Android 13 or newer</string>
+
+    <string name="title_apps">Select apps</string>
+    <string name="action_back">Back</string>
+    <string name="action_search">Search</string>
+    <string name="action_filter">Filter</string>
+    <string name="action_refresh">Refresh</string>
+    <string name="action_export">Export</string>
+    <string name="action_import">Import</string>
+    <string name="filter_all">All</string>
+    <string name="filter_user">User apps</string>
+    <string name="filter_system">System apps</string>
+    <string name="filter_clear">Clear</string>
+    <string name="hint_search">Search by app name or package</string>
+    <string name="loading">Loading…</string>
+    <string name="no_data">No matching apps</string>
+    <string name="count_result">%1$d apps</string>
+    <string name="hint_selected_first">Selected apps are listed first</string>
+    <string name="export_success">Exported</string>
+    <string name="export_failed">Export failed</string>
+    <string name="import_success">Imported</string>
+    <string name="import_failed">Import failed</string>
+    <string name="blocked_not_delivered">Config channel not ready — the change did NOT take effect (activate the module in LSPosed, then retry)</string>
+    <string name="blocked_toast">Hidden: %1$s</string>
+    <string name="unblocked_toast">No longer hidden: %1$s</string>
+    <string name="confirm">OK</string>
+    <string name="cancel">Cancel</string>
+</resources>

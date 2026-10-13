@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- 一个被划掉的人形 + 无障碍圆环：表示“没有开启无障碍” -->
+    <path
+        android:fillColor="#FF3B7DD8"
+        android:pathData="M0,0h48v48h-48z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M24,10m-4,0a4,4 0 1,0 8,0a4,4 0 1,0 -8,0" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M22,16h4v10h-4z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M15,28h18v3h-18z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M20,31h3v9h-3z" />
+    <path
+        android:fillColor="#FFFFFFFF"
+        android:pathData="M25,31h3v9h-3z" />
+    <path
+        android:strokeColor="#FFE03B3B"
+        android:strokeWidth="3"
+        android:pathData="M10,38L38,10" />
+</vector>
