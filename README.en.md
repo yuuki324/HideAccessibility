@@ -94,6 +94,18 @@ CI builds on every push — see [`.github/workflows/build.yml`](.github/workflow
 It holds no key, so it only verifies that the project **builds**; it does not produce a
 distributable APK.
 
+Pushing a tag such as `v1.0.0` triggers [`.github/workflows/release.yml`](.github/workflows/release.yml),
+which signs with a key taken from repository secrets and attaches the APK to a GitHub Release.
+Two secrets are needed (Settings → Secrets and variables → Actions):
+
+| Secret | Value |
+|---|---|
+| `KEYSTORE_BASE64` | base64 of your keystore: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("your.jks"))` |
+| `KEYSTORE_PASSWORD` | the keystore password |
+
+With those unset the workflow **fails on purpose** — publishing an unsigned or debug-signed
+release would be worse than not publishing one.
+
 ## Install and use
 
 1. Install the APK and enable the module in your framework (LSPosed).

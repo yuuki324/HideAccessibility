@@ -84,6 +84,18 @@ keytool -genkeypair -v \
 CI 在每次 push 时构建（见 [`.github/workflows/build.yml`](.github/workflows/build.yml)）。
 CI 上没有密钥，因此它只验证**能否构建**，不产出可分发的 APK。
 
+推送一个 tag（如 `v1.0.0`）会触发 [`.github/workflows/release.yml`](.github/workflows/release.yml)：
+它用仓库 Secrets 里的密钥签名，并把 APK 附到 GitHub Release 上。需要在仓库
+Settings → Secrets and variables → Actions 里配置两项：
+
+| Secret | 内容 |
+|---|---|
+| `KEYSTORE_BASE64` | 密钥文件的 base64：`[Convert]::ToBase64String([IO.File]::ReadAllBytes("your.jks"))` |
+| `KEYSTORE_PASSWORD` | 密钥库密码 |
+
+没配置这两项时，该 workflow **会主动失败**——发布一个未签名或 debug 签名的版本，
+比不发布更糟。
+
 ## 安装与使用
 
 1. 安装 APK，在框架（LSPosed）中启用本模块。
