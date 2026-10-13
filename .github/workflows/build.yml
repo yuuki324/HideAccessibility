@@ -22,14 +22,17 @@ jobs:
           distribution: temurin
           java-version: '17'
 
-      - name: Set up Android SDK
-        uses: android-actions/setup-android@v3
+      # No Android SDK setup step on purpose: the ubuntu runner image already ships the
+      # SDK (ANDROID_HOME is exported) and Gradle locates it automatically.
+      # `android-actions/setup-android` is deliberately avoided -- it re-installs
+      # cmdline-tools and then runs `sdkmanager tools`, a package Google has removed,
+      # which fails the job before the build ever starts.
 
       - name: Set up Gradle
         uses: gradle/actions/setup-gradle@v4
 
       - name: Build release APK
-        run: ./gradlew --no-daemon assembleRelease
+        run: ./gradlew --no-daemon --stacktrace assembleRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
