@@ -1,5 +1,7 @@
 [versions]
-agp = "8.5.0"
+# AGP 8.5.2 is the floor for Kotlin 2.4.x: the Kotlin Gradle Plugin refuses to apply
+# against anything lower ("minimum supported 8.5.2").
+agp = "8.5.2"
 kotlin = "2.4.20"
 libxposed = "102.0.0"
 
