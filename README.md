@@ -7,20 +7,21 @@
 
 **简体中文** | [English](README.en.md)
 
-> **这不是上游的官方版本，而是它的一个移植分支。** 本仓库是
-> [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility)（GPL-3.0）
+> **这不是上游的官方版本，而是它的衍生作品（Derivative Work）。**
+> 本仓库是 [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility)
 > 的 libxposed API 102 移植版：包名、应用名、版本线都独立，框架层从 legacy Xposed API +
-> YukiHookAPI 换成了 libxposed API 102。
+> YukiHookAPI 换成了 libxposed API 102，UI 与业务逻辑做了大量重构与重写。
 >
-> **上游作者与版权**：原作者为 **Nitsuya**。本项目作为衍生作品，沿用上游的 **GPL-3.0**
-> 许可，上游版权与衍生范围见 [`NOTICE`](NOTICE)。
+> **作者与版权**：原作者 **Nitsuya**。本项目在查看原项目代码、采用其部分架构设计的基础上
+> 完成，依据上游的 **GPL-3.0** 许可，本项目同样以 GPL-3.0 发布。上游版权与衍生范围见
+> [`NOTICE`](NOTICE)，源文件头部也保留了双版权声明。
 >
 > **当前维护者**：[@yuuki324](https://github.com/yuuki324)。
 >
-> **为什么 Contributors 列表里没有原作者**：本仓库并非从上游 fork 而来，git 提交历史
-> 中不包含上游的提交，因此 GitHub 的 Contributors 只统计本仓库的提交者。这是历史记录
-> 形式上的差异，**不代表来源声明缺失**——上游项目、作者和衍生范围已在 `NOTICE`
-> 与本段中明确声明。
+> **为什么 Contributors 列表里没有原作者**：本仓库采用全新初始化的 Git 仓库，而非从上游
+> fork，因此提交历史中不包含原作者的提交，GitHub 的 Contributors 只统计本仓库的提交者。
+> 这是历史记录形式上的差异，**不代表来源声明缺失**——原作者的版权已在源文件头部、
+> `NOTICE` 与本段中明确声明。特别感谢原作者的贡献。
 
 ## 功能
 

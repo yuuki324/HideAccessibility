@@ -30,5 +30,24 @@ stay compatible:
 Because this work is derived from a GPL-3.0 project, this project is licensed under
 GPL-3.0 as well. See LICENSE for the full license text.
 
+Every Kotlin source file under app/src/main/ carries a dual copyright header naming both
+the upstream author and this project's author, together with the GPL-3.0-or-later notice
+and an SPDX identifier.
+
 The git history of this repository does not include the upstream commits; the upstream
-authorship is recorded here and in README instead.
+authorship is recorded here, in the source headers, and in README instead.
+
+Third-party dependencies
+------------------------
+
+The runtime dependencies are licensed under Apache-2.0, which is compatible with
+GPL-3.0:
+
+    io.github.libxposed:api        Apache-2.0
+    io.github.libxposed:service    Apache-2.0
+    io.github.libxposed:interface  Apache-2.0  (runtime dependency of :service)
+    org.jetbrains.kotlin:kotlin-stdlib  Apache-2.0
+
+They are consumed as unmodified binaries; their own license texts and notices ship inside
+their published artifacts. Nothing from these projects is copied into this repository's
+source, so no additional attribution file is required for them.

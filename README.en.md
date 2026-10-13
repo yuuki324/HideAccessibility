@@ -8,22 +8,25 @@ any app you did not select are unaffected.
 
 **English** | [简体中文](README.md)
 
-> **This is not the upstream project — it is a port of it.** It is a libxposed API 102 port
-> of [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility) (GPL-3.0):
-> the package name, app name and version line are independent, and the framework layer was
-> moved from the legacy Xposed API + YukiHookAPI to libxposed API 102.
+> **This is not the upstream project — it is a derivative work of it.** It is a libxposed
+> API 102 port of [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility):
+> the package name, app name and version line are independent, the framework layer was moved
+> from the legacy Xposed API + YukiHookAPI to libxposed API 102, and the UI and business logic
+> were largely restructured.
 >
-> **Upstream authorship**: the original author is **Nitsuya**. As a derived work, this project
-> keeps the upstream **GPL-3.0** license; see [`NOTICE`](NOTICE) for the upstream copyright and
-> the scope of derivation.
+> **Authorship and copyright**: the original author is **Nitsuya**. This project was written
+> after reading the upstream source and adopts parts of its architecture, so under the
+> upstream **GPL-3.0** license this project is released under GPL-3.0 as well. The upstream
+> copyright and the scope of derivation are recorded in [`NOTICE`](NOTICE), and every source
+> file keeps a dual copyright header.
 >
 > **Maintainer**: [@yuuki324](https://github.com/yuuki324).
 >
-> **Why the upstream author is not in the Contributors list**: this repository was not forked
-> from upstream, so its git history contains none of the upstream commits and GitHub counts
-> only this repository's committers. That is a difference in how history is recorded — it does
-> **not** mean attribution is missing: the upstream project, author and scope of derivation are
-> stated in `NOTICE` and above.
+> **Why the upstream author is not in the Contributors list**: this repository was created
+> fresh rather than forked from upstream, so its git history contains none of the upstream
+> commits and GitHub counts only this repository's committers. That is a difference in how
+> history is recorded — it does **not** mean attribution is missing: the upstream copyright is
+> stated in the source headers, `NOTICE` and above. Thanks to the original author for their work.
 
 ## Features
 
