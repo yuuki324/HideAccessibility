@@ -29,14 +29,29 @@ android {
         // (java_init.list, module.prop, scope.list) and is packaged as-is.
     }
 
-    signingConfigs {
-        // The release build is signed with the debug key so the artifact is installable
-        // out of the box. Replace with your own keystore before distributing widely.
-        create("release") {
-            storeFile = file("debug.keystore")
-            storePassword = "android"
-            keyAlias = "androiddebugkey"
-            keyPassword = "android"
+    // Release signing is deliberately optional and keeps the keystore OUT of the repository:
+    // the Android debug key is public (its password is literally "android"), so anyone who
+    // has it can publish an update that installs over yours.
+    //
+    // Local machine (put these three lines in ~/.gradle/gradle.properties, never in git):
+    //     hideaccessibility.storeFile=E:/dsh workspace/keys/hideaccessibility-release.jks
+    //     hideaccessibility.storePassword=<your password>
+    //     hideaccessibility.keyAlias=hideaccessibility
+    //
+    // With them present, `assembleRelease` produces a properly signed APK. Without them --
+    // e.g. on CI, which holds no secrets -- the release build is simply left unsigned, so
+    // the task still succeeds for build verification. An unsigned APK cannot be installed;
+    // that is intentional, so a test artifact is never mistaken for a release.
+    val releaseKeystore = providers.gradleProperty("hideaccessibility.storeFile").orNull
+    val releaseKeystoreFile = releaseKeystore?.let { file(it) }
+    if (releaseKeystoreFile != null && releaseKeystoreFile.exists()) {
+        signingConfigs {
+            create("release") {
+                storeFile = releaseKeystoreFile
+                storePassword = providers.gradleProperty("hideaccessibility.storePassword").orNull
+                keyAlias = providers.gradleProperty("hideaccessibility.keyAlias").orNull
+                keyPassword = providers.gradleProperty("hideaccessibility.storePassword").orNull
+            }
         }
     }
 
@@ -44,7 +59,8 @@ android {
         release {
             isMinifyEnabled = false
             proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro")
-            signingConfig = signingConfigs.getByName("release")
+            // Signed only when the keystore above is configured.
+            signingConfig = signingConfigs.findByName("release")
         }
     }
 

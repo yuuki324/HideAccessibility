@@ -53,9 +53,36 @@
 
 产物在 `app/build/outputs/apk/release/`。
 
-Release 构建使用仓库内附的 debug keystore（`app/debug.keystore`）签名，方便直接安装测试。
-**正式分发前请替换为你自己的 keystore。** CI 会在每次 push 时构建并上传 APK
-（见 [`.github/workflows/build.yml`](.github/workflows/build.yml)）。
+### 签名
+
+**仓库里不含任何签名密钥。** Android 的 debug key 是公开的（密码就是 `android`），
+谁拿到都能签出一个"能覆盖安装到你机器上"的更新，所以不适合用来签发布版。
+
+签名配置是**可选**的：在 `~/.gradle/gradle.properties`（不是在项目里）写入下面三行，
+`assembleRelease` 就会产出正式签名的 APK：
+
+```properties
+hideaccessibility.storeFile=E:/path/to/your/hideaccessibility-release.jks
+hideaccessibility.storePassword=<你的密码>
+hideaccessibility.keyAlias=hideaccessibility
+```
+
+没配置时，release 构建**不签名**——任务仍然成功（便于 CI 只做编译验证），但产出的 APK
+无法安装。这是刻意的：测试产物不该被误当成发布版。
+
+生成自己的密钥（只需一次，之后请妥善备份；**丢失后无法再发布覆盖安装的更新**）：
+
+```bash
+keytool -genkeypair -v \
+  -keystore hideaccessibility-release.jks \
+  -alias hideaccessibility \
+  -keyalg RSA -keysize 4096 -validity 10000 \
+  -storetype PKCS12 \
+  -dname "CN=yuuki324, OU=HideAccessibility, O=yuuki324, C=CN"
+```
+
+CI 在每次 push 时构建（见 [`.github/workflows/build.yml`](.github/workflows/build.yml)）。
+CI 上没有密钥，因此它只验证**能否构建**，不产出可分发的 APK。
 
 ## 安装与使用
 

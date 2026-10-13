@@ -59,10 +59,40 @@ This is a standard Gradle project. Open it in Android Studio, or from the comman
 
 The APK lands in `app/build/outputs/apk/release/`.
 
-The release build is signed with the debug keystore bundled in the repository
-(`app/debug.keystore`) so the artifact is installable out of the box.
-**Replace it with your own keystore before distributing widely.**
-CI builds the APK on every push — see [`.github/workflows/build.yml`](.github/workflows/build.yml).
+### Signing
+
+**No signing key is kept in this repository.** The Android debug key is public (its password
+is literally `android`), so anyone who has it can publish an update that installs over yours —
+it is not suitable for signing a release.
+
+Signing is **optional**. Put these three lines in `~/.gradle/gradle.properties` (not in the
+project) and `assembleRelease` produces a properly signed APK:
+
+```properties
+hideaccessibility.storeFile=E:/path/to/your/hideaccessibility-release.jks
+hideaccessibility.storePassword=<your password>
+hideaccessibility.keyAlias=hideaccessibility
+```
+
+Without them the release build is **left unsigned**: the task still succeeds (so CI can verify
+compilation) but the APK cannot be installed. That is deliberate, so a test artifact is never
+mistaken for a release.
+
+Generate your own key once — and back it up, because losing it means you can never publish an
+update that installs over an existing installation:
+
+```bash
+keytool -genkeypair -v \
+  -keystore hideaccessibility-release.jks \
+  -alias hideaccessibility \
+  -keyalg RSA -keysize 4096 -validity 10000 \
+  -storetype PKCS12 \
+  -dname "CN=yuuki324, OU=HideAccessibility, O=yuuki324, C=CN"
+```
+
+CI builds on every push — see [`.github/workflows/build.yml`](.github/workflows/build.yml).
+It holds no key, so it only verifies that the project **builds**; it does not produce a
+distributable APK.
 
 ## Install and use
 

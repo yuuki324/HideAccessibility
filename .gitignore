@@ -12,11 +12,12 @@ captures/
 # Build output committed by mistake
 *.apk
 
+# Signing material must never be committed. The app is signed at build time from a
+# keystore outside the repository (see app/build.gradle.kts).
+*.jks
+*.keystore
+*.p12
+
 # OS
 .DS_Store
 Thumbs.db
-
-# Keystores other than the bundled debug key
-*.jks
-*.p12
-!app/debug.keystore
