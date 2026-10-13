@@ -8,6 +8,7 @@ any app you did not select are unaffected.
 
 **English** | [简体中文](README.md)
 
+[![Build](https://github.com/yuuki324/HideAccessibility/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/yuuki324/HideAccessibility/actions/workflows/build.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 > **This is not the upstream project — it is a derivative work of it.** It is a libxposed

@@ -7,6 +7,7 @@
 
 **简体中文** | [English](README.en.md)
 
+[![Build](https://github.com/yuuki324/HideAccessibility/actions/workflows/build.yml/badge.svg?branch=main)](https://github.com/yuuki324/HideAccessibility/actions/workflows/build.yml)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](LICENSE)
 
 > **这不是上游的官方版本，而是它的衍生作品（Derivative Work）。**
