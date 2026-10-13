@@ -1,0 +1,34 @@
+HideAccessibility
+Copyright (C) 2026 yuuki324
+
+This project is a port of, and contains material derived from:
+
+    DoNotTryAccessibility
+    https://github.com/Nitsuya/DoNotTryAccessibility
+    Copyright (C) Nitsuya
+    Licensed under the GNU General Public License, version 3.
+
+Scope of derivation
+-------------------
+
+The upstream source was read and used as the reference for this port. The framework
+layer was rewritten for libxposed API 102 (the upstream uses the legacy Xposed API via
+YukiHookAPI), so the hook implementation itself is new code, but the following were
+deliberately kept identical to upstream so that behaviour and existing configuration
+stay compatible:
+
+  - the three interception points:
+      AccessibilityManagerService#addClient
+      AccessibilityManagerService#getEnabledAccessibilityServiceList
+      ContentProvider$Transport#call (authority "settings", method "GET_secure")
+  - the replacement values those hooks return (0L / empty list / "" / "0")
+  - the Settings.Secure generation-index invalidation
+    (Bundle key "_generation_index" set to -1)
+  - the configuration group name ("config") and the hidden-list key ("_block_apps")
+  - the local fallback preferences file naming convention ("<package>_preferences")
+
+Because this work is derived from a GPL-3.0 project, this project is licensed under
+GPL-3.0 as well. See LICENSE for the full license text.
+
+The git history of this repository does not include the upstream commits; the upstream
+authorship is recorded here and in README instead.

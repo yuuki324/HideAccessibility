@@ -8,11 +8,22 @@ any app you did not select are unaffected.
 
 **English** | [简体中文](README.md)
 
-> **This is not the upstream project.** It is a libxposed API 102 port of
-> [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility) (GPL-3.0):
+> **This is not the upstream project — it is a port of it.** It is a libxposed API 102 port
+> of [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility) (GPL-3.0):
 > the package name, app name and version line are independent, and the framework layer was
 > moved from the legacy Xposed API + YukiHookAPI to libxposed API 102.
-> Upstream copyright belongs to the original author.
+>
+> **Upstream authorship**: the original author is **Nitsuya**. As a derived work, this project
+> keeps the upstream **GPL-3.0** license; see [`NOTICE`](NOTICE) for the upstream copyright and
+> the scope of derivation.
+>
+> **Maintainer**: [@yuuki324](https://github.com/yuuki324).
+>
+> **Why the upstream author is not in the Contributors list**: this repository was not forked
+> from upstream, so its git history contains none of the upstream commits and GitHub counts
+> only this repository's committers. That is a difference in how history is recorded — it does
+> **not** mean attribution is missing: the upstream project, author and scope of derivation are
+> stated in `NOTICE` and above.
 
 ## Features
 
@@ -107,11 +118,12 @@ adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibil
 
 ## License
 
-**GPL-3.0** — see [`LICENSE`](LICENSE), which is the upstream project's license kept as-is.
-Upstream copyright belongs to the original author.
+**GPL-3.0** — see [`LICENSE`](LICENSE) (the upstream project's license, kept as-is) and
+[`NOTICE`](NOTICE) (upstream copyright holder and the scope of derivation).
 
-This means the project is **copyleft**: redistributing it, with or without changes, requires
-passing on the same license and making the corresponding source available.
+This project is a **derived work** of a GPL-3.0 project and is therefore released under
+GPL-3.0 as well. That makes it **copyleft**: redistributing it, with or without changes,
+requires passing on the same license and making the corresponding source available.
 
 Runtime dependencies are Apache-2.0 (`io.github.libxposed:api` / `service`, Kotlin standard
 library). Apache-2.0 is compatible with GPL-3.0 — the combination may be distributed under

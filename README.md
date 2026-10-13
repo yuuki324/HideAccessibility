@@ -7,10 +7,20 @@
 
 **简体中文** | [English](README.en.md)
 
-> **这不是上游的官方版本。** 本仓库是
+> **这不是上游的官方版本，而是它的一个移植分支。** 本仓库是
 > [Nitsuya/DoNotTryAccessibility](https://github.com/Nitsuya/DoNotTryAccessibility)（GPL-3.0）
 > 的 libxposed API 102 移植版：包名、应用名、版本线都独立，框架层从 legacy Xposed API +
-> YukiHookAPI 换成了 libxposed API 102。上游版权归原作者所有。
+> YukiHookAPI 换成了 libxposed API 102。
+>
+> **上游作者与版权**：原作者为 **Nitsuya**。本项目作为衍生作品，沿用上游的 **GPL-3.0**
+> 许可，上游版权与衍生范围见 [`NOTICE`](NOTICE)。
+>
+> **当前维护者**：[@yuuki324](https://github.com/yuuki324)。
+>
+> **为什么 Contributors 列表里没有原作者**：本仓库并非从上游 fork 而来，git 提交历史
+> 中不包含上游的提交，因此 GitHub 的 Contributors 只统计本仓库的提交者。这是历史记录
+> 形式上的差异，**不代表来源声明缺失**——上游项目、作者和衍生范围已在 `NOTICE`
+> 与本段中明确声明。
 
 ## 功能
 
@@ -98,11 +108,11 @@ adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibil
 
 ## 许可
 
-**GPL-3.0** —— 见 [`LICENSE`](LICENSE)。该文件是上游项目的许可证，原样保留，
-上游版权归原作者所有。
+**GPL-3.0** —— 见 [`LICENSE`](LICENSE)（上游项目的许可证，原样保留）与
+[`NOTICE`](NOTICE)（上游版权人与衍生范围声明）。
 
-这意味着本项目是**传染性许可（copyleft）**：再分发（无论是否修改）都必须沿用同一许可，
-并提供对应源码。
+本项目是上游 GPL-3.0 项目的**衍生作品**，因此同样以 GPL-3.0 发布。这意味着它是
+**传染性许可（copyleft）**：再分发（无论是否修改）都必须沿用同一许可，并提供对应源码。
 
 运行期依赖为 Apache-2.0（`io.github.libxposed:api` / `service`、Kotlin 标准库）。
 Apache-2.0 与 GPL-3.0 兼容——组合后可整体按 GPL-3.0 分发，各依赖自身的 Apache-2.0 声明
