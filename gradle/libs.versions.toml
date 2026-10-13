@@ -2,13 +2,14 @@
 # libxposed 102.0.0 ships AAR metadata with minCompileSdk=37, so the project has to
 # compile against Android API 37 -- which in turn needs AGP 9.x (AGP 8.5.x tops out at 34).
 agp = "9.1.1"
-kotlin = "2.4.20"
 libxposed = "102.0.0"
 
 [libraries]
 libxposed-api = { module = "io.github.libxposed:api", version.ref = "libxposed" }
 libxposed-service = { module = "io.github.libxposed:service", version.ref = "libxposed" }
 
+# No Kotlin plugin here on purpose: AGP 9.x applies Kotlin support itself, and applying
+# `org.jetbrains.kotlin.android` alongside it fails the build. Pin the Kotlin version
+# through AGP's built-in mechanism instead.
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
-kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

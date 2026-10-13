@@ -1,6 +1,9 @@
+// AGP 9.x has Kotlin support built in, so `org.jetbrains.kotlin.android` is intentionally
+// NOT applied here — AGP 9 fails the build if it is:
+//   "The 'org.jetbrains.kotlin.android' plugin is no longer required for Kotlin support
+//    since AGP 9.0."
 plugins {
     alias(libs.plugins.android.application)
-    alias(libs.plugins.kotlin.android)
 }
 
 android {
@@ -61,11 +64,9 @@ android {
     }
 }
 
-kotlin {
-    compilerOptions {
-        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
-    }
-}
+// No top-level `kotlin { }` block: that extension belongs to the Kotlin Gradle Plugin
+// (KGP), and under AGP 9 the project does not apply KGP at all. Kotlin compilation is
+// configured through AGP's built-in support instead.
 
 dependencies {
     implementation(libs.libxposed.api)
