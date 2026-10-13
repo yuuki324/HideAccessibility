@@ -1,7 +1,7 @@
 [versions]
-# AGP 8.5.2 is the floor for Kotlin 2.4.x: the Kotlin Gradle Plugin refuses to apply
-# against anything lower ("minimum supported 8.5.2").
-agp = "8.5.2"
+# libxposed 102.0.0 ships AAR metadata with minCompileSdk=37, so the project has to
+# compile against Android API 37 -- which in turn needs AGP 9.x (AGP 8.5.x tops out at 34).
+agp = "9.1.1"
 kotlin = "2.4.20"
 libxposed = "102.0.0"
 

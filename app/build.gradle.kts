@@ -5,11 +5,19 @@ plugins {
 
 android {
     namespace = "app.hide.accessibility"
-    compileSdk = 34
+
+    // libxposed 102.0.0 declares minCompileSdk=37 in its AAR metadata, so compiling
+    // against anything lower fails in :app:checkReleaseAarMetadata.
+    compileSdk = 37
 
     defaultConfig {
         applicationId = "app.hide.accessibility"
         minSdk = 27
+
+        // targetSdk stays at 34 on purpose: it opts the app into new runtime behaviour and
+        // affects how it is treated on newer devices. The module only runs inside
+        // system_server and its UI is plain framework views, so raising compileSdk alone is
+        // enough to satisfy the dependency.
         targetSdk = 34
         versionCode = 1
         versionName = "1.0.0"
