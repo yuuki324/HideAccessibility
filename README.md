@@ -96,6 +96,14 @@ Settings → Secrets and variables → Actions 里配置两项：
 没配置这两项时，该 workflow **会主动失败**——发布一个未签名或 debug 签名的版本，
 比不发布更糟。
 
+**想先预览再公开**：在 Actions 里手动运行 `Release`，填入 tag 并勾选 `draft`。
+它会照常构建、签名、上传 APK，但 Release 处于草稿状态，只有你自己可见；
+确认无误后在 Release 页面点 **Publish release** 即可公开。
+
+APK 的 `versionName` / `versionCode` 由构建时从 git 推导（见
+[`app/build.gradle.kts`](app/build.gradle.kts)），所以**只要打 tag 就行**，
+不需要手工改版本号，也不会出现 tag 与 APK 内版本不一致。
+
 ## 安装与使用
 
 1. 安装 APK，在框架（LSPosed）中启用本模块。

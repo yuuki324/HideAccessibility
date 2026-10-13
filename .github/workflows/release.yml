@@ -1,6 +1,16 @@
 name: Release
 
-# Publishing a tag like v1.0.0 builds a signed APK and attaches it to a GitHub Release.
+# Two ways to produce a release:
+#
+#   1. Push a tag        -> builds a signed APK and publishes it directly.
+#                           git tag v1.0.0 && git push origin v1.0.0
+#
+#   2. Run this workflow manually (Actions -> Release -> Run workflow) and give it a tag.
+#      Tick "draft" to publish a DRAFT release instead: the APK is built, signed and
+#      uploaded, but the release stays invisible to everyone else until you press
+#      "Publish release" on the GitHub release page. That is the way to review an
+#      artifact before making it public.
+#
 # Signing needs two repository secrets:
 #
 #   KEYSTORE_BASE64    base64 of your .jks file
@@ -10,6 +20,9 @@ name: Release
 # Without them this workflow fails on purpose: publishing an unsigned or debug-signed
 # release would be worse than not publishing at all. The regular Build workflow still
 # verifies compilation on every push without needing any secret.
+#
+# The APK's versionName/versionCode are derived from git at build time (see
+# app/build.gradle.kts), so tagging v1.1.0 is enough -- there is no version to bump by hand.
 
 on:
   push:
@@ -20,6 +33,10 @@ on:
       tag:
         description: 'Tag to publish (e.g. v1.0.0)'
         required: true
+      draft:
+        description: 'Create as a draft release (review before publishing)'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -60,6 +77,12 @@ jobs:
             -Phideaccessibility.storePassword="$KEYSTORE_PASSWORD" \
             -Phideaccessibility.keyAlias=hideaccessibility
 
+      - name: Show the version that went into the APK
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -n1)
+          AAPT2=$(find "$ANDROID_HOME/build-tools" -name aapt2 -type f | sort -V | tail -n1)
+          "$AAPT2" dump badging "$APK" | grep '^package:'
+
       - name: Verify the APK is signed with the release key
         run: |
           APK=$(ls app/build/outputs/apk/release/*.apk | head -n1)
@@ -71,5 +94,6 @@ jobs:
         with:
           tag_name: ${{ github.event.inputs.tag || github.ref_name }}
           name: ${{ github.event.inputs.tag || github.ref_name }}
+          draft: ${{ github.event.inputs.draft == 'true' }}
           generate_release_notes: true
           files: app/build/outputs/apk/release/*.apk

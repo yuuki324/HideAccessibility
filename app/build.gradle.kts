@@ -6,6 +6,37 @@ plugins {
     alias(libs.plugins.android.application)
 }
 
+// Version comes from git instead of being typed by hand, so a release cannot be tagged
+// v1.1.0 while the APK still reports 1.0.0:
+//
+//   versionName = nearest tag ("v1.0.0" -> "1.0.0"); a commit past the tag appends the
+//                 describe suffix, e.g. "1.0.0-3-gabc1234"
+//   versionCode = number of commits in the branch -- monotonic as long as history is not
+//                 rewritten, and always increasing between releases
+//
+// Both fall back to a fixed value when git is unavailable (source archive, CI checkout
+// without tags). Override either with -Phideaccessibility.versionName=... / .versionCode=...
+fun gitOutput(vararg args: String): String? = try {
+    val process = ProcessBuilder(listOf("git") + args)
+        .redirectErrorStream(true)
+        .start()
+    val text = process.inputStream.bufferedReader().use { it.readText() }.trim()
+    process.waitFor()
+    text.ifBlank { null }
+} catch (_: Exception) {
+    null
+}
+
+val gitVersionName: String = providers.gradleProperty("hideaccessibility.versionName").orNull
+    ?: gitOutput("describe", "--tags", "--always")
+        ?.removePrefix("v")
+        ?.takeIf { it.isNotBlank() }
+    ?: "1.0.0"
+
+val gitVersionCode: Int = providers.gradleProperty("hideaccessibility.versionCode").orNull?.toIntOrNull()
+    ?: gitOutput("rev-list", "--count", "HEAD")?.toIntOrNull()
+    ?: 1
+
 android {
     namespace = "app.hide.accessibility"
 
@@ -22,8 +53,8 @@ android {
         // system_server and its UI is plain framework views, so raising compileSdk alone is
         // enough to satisfy the dependency.
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0.0"
+        versionCode = gitVersionCode
+        versionName = gitVersionName
 
         // API 102 module metadata lives in app/src/main/resources/META-INF/xposed/
         // (java_init.list, module.prop, scope.list) and is packaged as-is.

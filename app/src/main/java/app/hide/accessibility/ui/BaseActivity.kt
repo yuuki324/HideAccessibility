@@ -21,8 +21,10 @@
 package app.hide.accessibility.ui
 
 import android.app.Activity
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import android.view.WindowInsetsController
 import app.hide.accessibility.R
 
 /**
@@ -30,6 +32,9 @@ import app.hide.accessibility.R
  *
  * 用 framework 的 `Theme.DeviceDefault.DayNight`（见 res/values/themes.xml），
  * 深浅色跟随系统，不需要 AppCompatDelegate。
+ *
+ * 状态栏图标亮暗走 [WindowInsetsController]（API 30+）。旧的
+ * `View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR` 已弃用，仅为 API 27~29 保留。
  */
 abstract class BaseActivity : Activity() {
 
@@ -51,12 +56,23 @@ abstract class BaseActivity : Activity() {
             val bg = if (isNightMode) R.color.bg_dark else R.color.bg
             window.statusBarColor = getColor(bg)
             window.navigationBarColor = getColor(bg)
-            // 浅色背景用深色状态栏图标
-            val flags = window.decorView.systemUiVisibility
-            window.decorView.systemUiVisibility = if (isNightMode) {
-                flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+
+            // 浅色背景需要深色状态栏图标，深色背景反之
+            val lightIcons = !isNightMode
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+                window.insetsController?.setSystemBarsAppearance(
+                    if (lightIcons) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
+                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
+                )
             } else {
-                flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                @Suppress("DEPRECATION")
+                val flags = window.decorView.systemUiVisibility
+                @Suppress("DEPRECATION")
+                window.decorView.systemUiVisibility = if (lightIcons) {
+                    flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
+                } else {
+                    flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
+                }
             }
         }
     }

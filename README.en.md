@@ -106,6 +106,15 @@ Two secrets are needed (Settings → Secrets and variables → Actions):
 With those unset the workflow **fails on purpose** — publishing an unsigned or debug-signed
 release would be worse than not publishing one.
 
+**To review before going public**: run the `Release` workflow manually from the Actions tab,
+give it a tag and tick `draft`. It builds, signs and uploads the APK as usual, but the release
+stays a draft only you can see; press **Publish release** on the release page when you are happy
+with it.
+
+The APK's `versionName` / `versionCode` are derived from git at build time (see
+[`app/build.gradle.kts`](app/build.gradle.kts)), so **tagging is enough** — there is no version
+to bump by hand, and a tag can never disagree with the version inside the APK.
+
 ## Install and use
 
 1. Install the APK and enable the module in your framework (LSPosed).
