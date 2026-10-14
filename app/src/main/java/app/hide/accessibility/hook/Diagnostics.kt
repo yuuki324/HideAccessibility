@@ -35,7 +35,7 @@ import app.hide.accessibility.utils.PackageNames
  * 和"加载了但没拦到"（有加载日志、无命中日志）。
  *
  * 读 system_server 的日志需要 root（非 root 的 `adb shell` 拿不到），
- * 所以这里不做 UI 回传。详见 README「调试」一节。
+ * 所以这里不做 UI 回传。详见 README 的「遇到问题」一节。
  */
 object Diagnostics {
 

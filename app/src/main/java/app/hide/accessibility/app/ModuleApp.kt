@@ -21,7 +21,6 @@
 package app.hide.accessibility.app
 
 import android.app.Application
-import android.content.res.Configuration
 import android.util.Log
 import app.hide.accessibility.Const
 import app.hide.accessibility.data.ConfigStore
@@ -38,8 +37,4 @@ class ModuleApp : Application() {
         runCatching { Activation.observe { service -> Log.i(Const.TAG, "framework service: $service") } }
         Log.i(Const.TAG, "module app started, blocked=${ConfigStore.read(this).size}, channel=${ConfigStore.channelState}")
     }
-
-    /** 当前是否深色模式（用于状态栏图标明暗） */
-    fun isNightMode(): Boolean =
-        (resources.configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK) == Configuration.UI_MODE_NIGHT_YES
 }

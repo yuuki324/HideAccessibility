@@ -66,7 +66,7 @@ class ModuleEntry : XposedModule() {
     }
 
     override fun onPackageLoaded(param: XposedModuleInterface.PackageLoadedParam) {
-        // 作用域只有 android，正常不会走到这里；
+        // 作用域只有 system，正常不会走到这里；
         // 万一用户把模块勾到了别的应用上，也不要产生任何副作用。
         Log.i(Const.TAG, "onPackageLoaded(${param.packageName}) ignored")
     }
