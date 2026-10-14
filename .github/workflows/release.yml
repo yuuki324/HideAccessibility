@@ -46,7 +46,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # fetch-depth: 0 + fetch-tags: true are required, not cosmetic.
+      # app/build.gradle.kts derives versionName from `git describe --tags` and versionCode
+      # from `git rev-list --count HEAD`. The default checkout is a depth-1 shallow clone
+      # with no tags, which silently produced versionName="<commit-hash>" and versionCode=1
+      # in the built APK -- a v1.0.1 release would have shipped labelled "56e1b87".
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4

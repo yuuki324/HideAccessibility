@@ -14,7 +14,15 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+      # fetch-depth: 0 + fetch-tags: true are required, not cosmetic.
+      # app/build.gradle.kts derives versionName from `git describe --tags` and versionCode
+      # from `git rev-list --count HEAD`. The default checkout is a depth-1 shallow clone
+      # with no tags, which silently produced versionName="<commit-hash>" and versionCode=1
+      # in the CI-built APK -- the tag and the version inside the APK disagreed.
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -33,6 +41,12 @@ jobs:
 
       - name: Build release APK
         run: ./gradlew --no-daemon --stacktrace assembleRelease
+
+      - name: Show the version that went into the APK
+        run: |
+          APK=$(ls app/build/outputs/apk/release/*.apk | head -n1)
+          AAPT2=$(find "$ANDROID_HOME/build-tools" -name aapt2 -type f | sort -V | tail -n1)
+          "$AAPT2" dump badging "$APK" | grep '^package:'
 
       - name: Upload APK
         uses: actions/upload-artifact@v4

@@ -27,10 +27,18 @@ fun gitOutput(vararg args: String): String? = try {
     null
 }
 
+// `git describe --tags --always` returns the bare commit hash when no tag is reachable in
+// the history it can see -- exactly what a default `actions/checkout` shallow clone looks
+// like. A hash is not a version, so that case falls back to the default rather than
+// shipping "56e1b87" as the version name. The workflows now fetch full history and tags
+// (fetch-depth: 0, fetch-tags: true), so this is a backstop, not the primary fix.
+val describeOutput = gitOutput("describe", "--tags", "--always")
+val describeIsCommitHash = describeOutput?.matches(Regex("^[0-9a-f]{7,40}(-dirty)?$")) == true
+
 val gitVersionName: String = providers.gradleProperty("hideaccessibility.versionName").orNull
-    ?: gitOutput("describe", "--tags", "--always")
+    ?: describeOutput
         ?.removePrefix("v")
-        ?.takeIf { it.isNotBlank() }
+        ?.takeIf { it.isNotBlank() && !describeIsCommitHash }
     ?: "1.0.0"
 
 val gitVersionCode: Int = providers.gradleProperty("hideaccessibility.versionCode").orNull?.toIntOrNull()
