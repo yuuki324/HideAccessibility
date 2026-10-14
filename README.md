@@ -2,7 +2,7 @@
 
 让选定的应用以为本机没有开启无障碍服务。
 
-模块在 `system_server` 里拦截无障碍状态的读取路径，按 **Binder 调用方**判断该不该撒谎：
+模块在 `system_server` 里拦截无障碍状态的读取路径，按 **Binder 调用方**判断该不该返回虚假状态：
 系统自己的无障碍功能、以及未被选中的应用完全不受影响。
 
 **简体中文** | [English](README.en.md)
@@ -31,7 +31,7 @@
 - **按应用隐藏无障碍状态**：勾选的应用调用 `AccessibilityManager.isEnabled()`、
   `getEnabledAccessibilityServiceList()`，或读取 `Settings.Secure.ACCESSIBILITY_ENABLED` /
   `ENABLED_ACCESSIBILITY_SERVICES` 时，拿到的是"无障碍没开"。
-- **只骗调用方**：判断依据是 `Binder.getCallingUid()`，不是全局开关。
+- **只对调用方返回虚假状态**：判断依据是 `Binder.getCallingUid()`，不是全局开关。
 - **设备状态自检**：主界面直接显示两条被拦截通道的实测值，勾选自己就能验证 hook 是否生效。
 - **多语言**：简体中文 / 繁體中文 / English，Android 13+ 可在应用内切换。
 

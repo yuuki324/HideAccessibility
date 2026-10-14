@@ -3,8 +3,8 @@
 Make selected apps believe accessibility is turned off on this device.
 
 The module intercepts the accessibility-state read paths inside `system_server` and decides
-whether to lie based on the **Binder caller**: the system's own accessibility features and
-any app you did not select are unaffected.
+whether to report a false state, based on the **Binder caller**: the system's own
+accessibility features and any app you did not select are unaffected.
 
 **English** | [简体中文](README.md)
 
@@ -36,7 +36,7 @@ any app you did not select are unaffected.
 - **Per-app accessibility hiding.** When a selected app calls `AccessibilityManager.isEnabled()`
   or `getEnabledAccessibilityServiceList()`, or reads `Settings.Secure.ACCESSIBILITY_ENABLED` /
   `ENABLED_ACCESSIBILITY_SERVICES`, it gets "accessibility is off".
-- **Only the caller is fooled.** The decision is based on `Binder.getCallingUid()`, not a global switch.
+- **Only the caller sees a false state.** The decision is based on `Binder.getCallingUid()`, not a global switch.
 - **On-device self-check.** The main screen shows live values from both intercepted paths, so
   selecting the module itself is enough to verify the hooks work.
 - **Localised UI.** Simplified Chinese, Traditional Chinese and English, switchable in-app on Android 13+.

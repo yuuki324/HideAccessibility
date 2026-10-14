@@ -31,7 +31,7 @@ import java.util.concurrent.atomic.AtomicLong
  *
  * 判定链：`Binder.getCallingUid()` → `IPackageManager.getPackagesForUid(appId)` →
  * 逐个包名与隐藏列表求交。**任何一环失败都返回 null（不拦截）**——
- * 宁可漏拦也不能误拦：误拦会让未被勾选的应用也被骗。
+ * 宁可漏拦也不能误拦：误拦会让未被勾选的应用也读到虚假状态。
  */
 object CallerGuard {
 

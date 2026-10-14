@@ -45,7 +45,7 @@ import java.util.concurrent.atomic.AtomicInteger
  *     应用通过 `Settings.Secure.getString(ENABLED_ACCESSIBILITY_SERVICES/ACCESSIBILITY_ENABLED)`
  *     读设置时，把返回值改掉（只对 `_secure` 命名空间、只对这两个 key、只对被隐藏的调用方）。
  *
- * 判断"是否隐藏"一律看 `Binder.getCallingUid()` 对应的包名 —— 也就是"谁在问就骗谁"，
+ * 判断"是否隐藏"一律看 `Binder.getCallingUid()` 对应的包名 —— 也就是"谁在问，就只对谁返回虚假状态"，
  * 系统自己的无障碍服务、其他未被勾选的应用完全不受影响。
  *
  * 稳定性约定：每个 hook 体都自己吞异常并回落到原实现。system_server 里抛出去一个异常
