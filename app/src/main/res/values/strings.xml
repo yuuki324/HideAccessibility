@@ -14,6 +14,10 @@
     <string name="status_framework">Framework: %1$s %2$s (API %3$d)</string>
     <string name="status_system">System: %1$s</string>
     <string name="status_module">Module version: %1$s</string>
+    <!-- Shown when the APK was installed or updated after the current boot. LSPosed loads
+         modules when a process starts and system_server is long-lived, so new code is not
+         picked up until the device is rebooted. -->
+    <string name="warning_need_reboot">⚠ This module was installed or updated after the last boot, so the running system has not loaded it yet. Reboot the device for it to take effect.</string>
 
     <string name="button_manage_apps">Manage hidden apps</string>
     <string name="switch_hide_icon">Hide launcher icon</string>

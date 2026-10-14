@@ -4,4 +4,6 @@
     <color name="card">#FF1E1E1E</color>
     <color name="text_primary">#FFEDEDED</color>
     <color name="text_secondary">#FF9E9E9E</color>
+    <!-- 深色主题下的提示条底色；warn 沿用 values/colors.xml 里的值 -->
+    <color name="warn_bg">#FF3A2F14</color>
 </resources>

@@ -13,6 +13,9 @@
     <string name="status_framework">运行框架：%1$s %2$s（API %3$d）</string>
     <string name="status_system">系统版本：%1$s</string>
     <string name="status_module">模块版本：%1$s</string>
+    <!-- 模块是在本次开机之后安装/更新时显示。LSPosed 只在进程启动时加载模块，
+         system_server 开机后常驻，所以必须重启才会用上新代码。 -->
+    <string name="warning_need_reboot">⚠ 本模块是在本次开机之后安装/更新的，当前系统还没加载它。重启手机后才会生效。</string>
 
     <string name="button_manage_apps">管理被隐藏的应用</string>
     <string name="switch_hide_icon">隐藏桌面图标</string>

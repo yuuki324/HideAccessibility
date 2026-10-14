@@ -15,6 +15,9 @@
     <string name="status_framework">運行框架：%1$s %2$s（API %3$d）</string>
     <string name="status_system">系統版本：%1$s</string>
     <string name="status_module">模組版本：%1$s</string>
+    <!-- 模組是在本次開機之後安裝/更新時顯示。LSPosed 只在行程啟動時載入模組，
+         system_server 開機後常駐，所以必須重新啟動才會用上新程式碼。 -->
+    <string name="warning_need_reboot">⚠ 本模組是在本次開機之後安裝/更新的，目前系統還沒載入它。重新啟動手機後才會生效。</string>
 
     <string name="button_manage_apps">管理已隱藏的應用程式</string>
     <string name="switch_hide_icon">隱藏桌面圖示</string>

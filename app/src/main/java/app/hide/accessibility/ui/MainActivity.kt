@@ -66,6 +66,7 @@ class MainActivity : BaseActivity() {
     private lateinit var labelSettings: TextView
     private lateinit var labelHideIcon: TextView
     private lateinit var labelLanguageRow: TextView
+    private lateinit var warningReboot: TextView
     private val statusHandler = Handler(Looper.getMainLooper())
 
     override fun onCreate() {
@@ -85,6 +86,7 @@ class MainActivity : BaseActivity() {
         labelSettings = findViewById(R.id.label_settings)
         labelHideIcon = findViewById(R.id.label_hide_icon)
         labelLanguageRow = findViewById(R.id.label_language_row)
+        warningReboot = findViewById(R.id.warning_reboot)
 
         // 语言相关文本统一在 renderTexts() 里渲染，onCreate 与 onResume 都调一次：
         // 迁到前台时补一次，能盖住"系统没重建 Activity"和"重建时资源还是旧 locale"两种情况。
@@ -132,6 +134,13 @@ class MainActivity : BaseActivity() {
         statusHandler.postDelayed({
             renderStatus(Activation.state, Activation.current()?.let { Activation.hasSystemScope(it) } == true)
         }, UNKNOWN_TIMEOUT_MS)
+        // 模块在本次开机之后安装/更新过：LSPosed 只在进程启动时加载模块，必须重启才生效。
+        // 这里不依赖 Activation 的回调（那条路只在服务绑定/断开时触发），每次回前台判一次。
+        warningReboot.visibility = if (Activation.installedAfterBoot(this)) {
+            android.view.View.VISIBLE
+        } else {
+            android.view.View.GONE
+        }
         renderSelfCheck()
     }
 

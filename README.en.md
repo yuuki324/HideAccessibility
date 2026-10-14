@@ -50,12 +50,16 @@ accessibility features and any app you did not select are unaffected.
 
 ## Install and use
 
-1. Install the APK and enable the module in your framework (LSPosed).
-2. **Tick the scope the module recommends.**
-   Its display name differs between frameworks and ROMs — commonly "System", sometimes
-   "System Framework", or the literal `system`. Missing it makes the module fail
-   **silently**: the UI still reports "active" while nothing is intercepted.
-   **A reboot is required** after enabling it for the first time.
+> ⚠️ **After enabling the module and ticking its scope, you must reboot the device.**
+> LSPosed reads the configuration when a **process starts**, and `system_server` stays alive
+> from boot — without a reboot the configuration never takes effect: the UI still reports
+> "module is active" while nothing is actually intercepted.
+> The module detects this from the APK's install time and shows a reminder on the main screen.
+
+1. Install the APK → enable the module in your framework (LSPosed) → **tick the scope it recommends**.
+   The scope's display name differs between frameworks and ROMs — commonly "System", sometimes
+   "System Framework", or the literal `system`.
+2. **Reboot the device.** Skip this and you land in the silently-broken state described above.
 3. Open the module → "Manage hidden apps" → select the target apps.
 4. Start (or restart) the target app. It will believe accessibility is off.
 

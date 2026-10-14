@@ -167,4 +167,28 @@ object Activation {
             @Suppress("DEPRECATION")
             pm.getApplicationInfo(packageName, 0)
     }.map { it.loadLabel(context.packageManager).toString() }.getOrDefault(packageName)
+
+    /**
+     * 模块 APK 是否在**本次开机之后**安装或更新过。
+     *
+     * LSPosed 只在**进程启动**时加载模块，而 system_server 是开机后常驻的进程：模块一旦
+     * 安装或更新，必须重启设备，新代码才会被加载。在那之前界面可能显示「模块已激活」——
+     * 模块 App 能拿到框架服务，那条路走 Provider + 框架投递，与"system_server 里到底有没有
+     * 加载这个模块"无关，所以从界面上完全看不出问题。
+     *
+     * 判据是 `PackageInfo.lastUpdateTime`（首次安装时它等于安装时刻，所以两种情况都覆盖）
+     * 晚于本次开机时刻。开机时刻用「当前时间 - 开机以来的毫秒数」反推，不需要额外权限。
+     *
+     * 注意这跟「作用域没勾」是两回事，后者由 [hasSystemScope] 判定。
+     */
+    fun installedAfterBoot(context: Context): Boolean = runCatching {
+        val pm = context.packageManager
+        val installedAt = if (Build.VERSION.SDK_INT >= 33)
+            pm.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0L)).lastUpdateTime
+        else
+            @Suppress("DEPRECATION")
+            pm.getPackageInfo(context.packageName, 0).lastUpdateTime
+        val bootedAt = System.currentTimeMillis() - SystemClock.elapsedRealtime()
+        installedAt > bootedAt
+    }.getOrDefault(false)
 }

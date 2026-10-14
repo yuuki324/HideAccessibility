@@ -51,6 +51,22 @@
                 android:textSize="13sp" />
         </LinearLayout>
 
+        <!-- 「装了/更新了但没重启」提示。
+             LSPosed 只在进程启动时加载模块，而 system_server 开机后常驻；模块 APK 一旦
+             安装或更新，必须重启设备，新代码才会被加载。默认隐藏，由 MainActivity 按
+             「APK 更新时间 > 本次开机时间」判定后显示。 -->
+        <TextView
+            android:id="@+id/warning_reboot"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:background="@drawable/bg_warning"
+            android:padding="14dp"
+            android:text="@string/warning_need_reboot"
+            android:textColor="@color/text_primary"
+            android:textSize="13sp"
+            android:visibility="gone" />
+
         <Button
             android:id="@+id/button_apps"
             android:layout_width="match_parent"

@@ -11,4 +11,6 @@
     <color name="accent">#FF3B7DD8</color>
     <color name="ok">#FF2E9E5B</color>
     <color name="warn">#FFD08700</color>
+    <!-- 「装/更新后未重启」提示条的底色。深色主题里在 values-night/colors.xml 覆盖。 -->
+    <color name="warn_bg">#FFFDF3E3</color>
 </resources>
