@@ -65,9 +65,12 @@ android {
     // has it can publish an update that installs over yours.
     //
     // Local machine (put these three lines in ~/.gradle/gradle.properties, never in git):
-    //     hideaccessibility.storeFile=E:/dsh workspace/keys/hideaccessibility-release.jks
+    //     hideaccessibility.storeFile=/absolute/path/to/hideaccessibility-release.jks
     //     hideaccessibility.storePassword=<your password>
     //     hideaccessibility.keyAlias=hideaccessibility
+    //
+    // `file(...)` resolves a relative path against the app module directory, so a keystore
+    // sitting next to the project folder can also be given as ../hideaccessibility-release.jks
     //
     // With them present, `assembleRelease` produces a properly signed APK. Without them --
     // e.g. on CI, which holds no secrets -- the release build is simply left unsigned, so
@@ -116,9 +119,20 @@ android {
 // configured through AGP's built-in support instead.
 
 dependencies {
-    implementation(libs.libxposed.api)
-    // Required only on the app side: it provides XposedServiceHelper and the Binder
-    // stubs (IXposedService$Stub). `api` already depends on `interface` at runtime,
-    // but declaring it keeps the intent explicit.
+    // compileOnly, NOT implementation: the framework injects the libxposed API classes into
+    // the module's class loader at runtime. If they are packaged into the APK, LSPosed
+    // refuses to load the module outright:
+    //
+    //     E/LSPosedFramework: The Xposed API classes are compiled into the module's APK
+    //     E/LSPosedFramework:   Cannot load module: app.hide.accessibility
+    //     E/LSPosedFramework:   This may cause strange issues and must be fixed by the module developer.
+    //
+    // The failure is silent from the UI's point of view -- the module looks enabled, but
+    // nothing is ever hooked.
+    compileOnly(libs.libxposed.api)
+
+    // The service side is different: XposedProvider is declared in the manifest and
+    // XposedServiceHelper runs in the module's own process (see utils/Activation.kt), so
+    // these classes must be present in the APK.
     implementation(libs.libxposed.service)
 }

@@ -37,77 +37,15 @@
 
 ## 环境要求
 
-| 项目 | 版本 |
+| 项目 | 要求 |
 |---|---|
 | Android | 8.1（API 27）及以上 |
 | 框架 | 支持 **libxposed API 102** 的框架，如 LSPosed 2.x |
-| 构建 | JDK 17、Android SDK（compileSdk 34） |
-
-## 构建
-
-标准 Gradle 工程，推荐直接用 Android Studio 打开，或命令行：
-
-```bash
-./gradlew assembleRelease
-```
-
-产物在 `app/build/outputs/apk/release/`。
-
-### 签名
-
-**仓库里不含任何签名密钥。** Android 的 debug key 是公开的（密码就是 `android`），
-谁拿到都能签出一个"能覆盖安装到你机器上"的更新，所以不适合用来签发布版。
-
-签名配置是**可选**的：在 `~/.gradle/gradle.properties`（不是在项目里）写入下面三行，
-`assembleRelease` 就会产出正式签名的 APK：
-
-```properties
-hideaccessibility.storeFile=E:/path/to/your/hideaccessibility-release.jks
-hideaccessibility.storePassword=<你的密码>
-hideaccessibility.keyAlias=hideaccessibility
-```
-
-没配置时，release 构建**不签名**——任务仍然成功（便于 CI 只做编译验证），但产出的 APK
-无法安装。这是刻意的：测试产物不该被误当成发布版。
-
-生成自己的密钥（只需一次，之后请妥善备份；**丢失后无法再发布覆盖安装的更新**）：
-
-```bash
-keytool -genkeypair -v \
-  -keystore hideaccessibility-release.jks \
-  -alias hideaccessibility \
-  -keyalg RSA -keysize 4096 -validity 10000 \
-  -storetype PKCS12 \
-  -dname "CN=yuuki324, OU=HideAccessibility, O=yuuki324, C=CN"
-```
-
-CI 在每次 push 时构建（见 [`.github/workflows/build.yml`](.github/workflows/build.yml)）。
-CI 上没有密钥，因此它只验证**能否构建**，不产出可分发的 APK。
-
-推送一个 tag（如 `v1.0.0`）会触发 [`.github/workflows/release.yml`](.github/workflows/release.yml)：
-它用仓库 Secrets 里的密钥签名，并把 APK 附到 GitHub Release 上。需要在仓库
-Settings → Secrets and variables → Actions 里配置两项：
-
-| Secret | 内容 |
-|---|---|
-| `KEYSTORE_BASE64` | 密钥文件的 base64：`[Convert]::ToBase64String([IO.File]::ReadAllBytes("your.jks"))` |
-| `KEYSTORE_PASSWORD` | 密钥库密码 |
-
-没配置这两项时，该 workflow **会主动失败**——发布一个未签名或 debug 签名的版本，
-比不发布更糟。
-
-**想先预览再公开**：在 Actions 里手动运行 `Release`，填入 tag 并勾选 `draft`。
-它会照常构建、签名、上传 APK，但 Release 处于草稿状态，只有你自己可见；
-确认无误后在 Release 页面点 **Publish release** 即可公开。
-
-APK 的 `versionName` / `versionCode` 由构建时从 git 推导（见
-[`app/build.gradle.kts`](app/build.gradle.kts)），所以**只要打 tag 就行**，
-不需要手工改版本号，也不会出现 tag 与 APK 内版本不一致。
 
 ## 安装与使用
 
 1. 安装 APK，在框架（LSPosed）中启用本模块。
-2. **作用域勾选模块推荐的那一项**（`scope.list` 里是 `system`）。
+2. **作用域勾选模块推荐的那一项**。
    不同框架/ROM 上它的显示名不一样，常见为「系统」，也可能叫「系统框架」或直接显示 `system`。
    漏了它模块会**静默失效**：界面照样显示已激活，但什么都没拦住。
    首次启用后**需要重启**。
@@ -127,19 +65,19 @@ APK 的 `versionName` / `versionCode` 由构建时从 git 推导（见
 每个选项在任何界面语言下都保留一个能认出来的词（`Language` / `Follow system` 或语言名本身），
 这样即使界面落到看不懂的语言，也能找到出口切回来。
 
-## 调试
+## 遇到问题
 
-加载与命中日志走 logcat，TAG 为 `HideAccessibility`：
+日志 TAG 为 `HideAccessibility`：
 
 ```bash
 adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibility.Hooks:V
 ```
 
 - `HideAccessibility.Diagnostics` —— hook 安装结果、配置通道状态、当前生效的隐藏列表；
-- `HideAccessibility.Hooks` —— 首次命中时记录调用方包名；
-- `HideAccessibility.PackageNames` —— UID→包名解析路径（解析失败时不拦截，只告警）。
+- `HideAccessibility.Hooks` —— 首次命中时记录调用方包名。
 
 **读 `system_server` 的日志需要 root**，非 root 的 `adb shell` 拿不到。
+反馈问题时，附上 LSPosed 导出的日志会更容易定位。
 
 ## 这个模块能做什么、不能做什么
 
@@ -164,7 +102,3 @@ adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibil
 
 本项目是上游 GPL-3.0 项目的**衍生作品**，因此同样以 GPL-3.0 发布。这意味着它是
 **传染性许可（copyleft）**：再分发（无论是否修改）都必须沿用同一许可，并提供对应源码。
-
-运行期依赖为 Apache-2.0（`io.github.libxposed:api` / `service`、Kotlin 标准库）。
-Apache-2.0 与 GPL-3.0 兼容——组合后可整体按 GPL-3.0 分发，各依赖自身的 Apache-2.0 声明
-保留在它自己的 `LICENSE` 中。

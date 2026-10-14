@@ -47,78 +47,11 @@ any app you did not select are unaffected.
 |---|---|
 | Android | 8.1 (API 27) or newer |
 | Framework | Any framework supporting **libxposed API 102**, e.g. LSPosed 2.x |
-| Build | JDK 17, Android SDK (compileSdk 34) |
-
-## Building
-
-This is a standard Gradle project. Open it in Android Studio, or from the command line:
-
-```bash
-./gradlew assembleRelease
-```
-
-The APK lands in `app/build/outputs/apk/release/`.
-
-### Signing
-
-**No signing key is kept in this repository.** The Android debug key is public (its password
-is literally `android`), so anyone who has it can publish an update that installs over yours —
-it is not suitable for signing a release.
-
-Signing is **optional**. Put these three lines in `~/.gradle/gradle.properties` (not in the
-project) and `assembleRelease` produces a properly signed APK:
-
-```properties
-hideaccessibility.storeFile=E:/path/to/your/hideaccessibility-release.jks
-hideaccessibility.storePassword=<your password>
-hideaccessibility.keyAlias=hideaccessibility
-```
-
-Without them the release build is **left unsigned**: the task still succeeds (so CI can verify
-compilation) but the APK cannot be installed. That is deliberate, so a test artifact is never
-mistaken for a release.
-
-Generate your own key once — and back it up, because losing it means you can never publish an
-update that installs over an existing installation:
-
-```bash
-keytool -genkeypair -v \
-  -keystore hideaccessibility-release.jks \
-  -alias hideaccessibility \
-  -keyalg RSA -keysize 4096 -validity 10000 \
-  -storetype PKCS12 \
-  -dname "CN=yuuki324, OU=HideAccessibility, O=yuuki324, C=CN"
-```
-
-CI builds on every push — see [`.github/workflows/build.yml`](.github/workflows/build.yml).
-It holds no key, so it only verifies that the project **builds**; it does not produce a
-distributable APK.
-
-Pushing a tag such as `v1.0.0` triggers [`.github/workflows/release.yml`](.github/workflows/release.yml),
-which signs with a key taken from repository secrets and attaches the APK to a GitHub Release.
-Two secrets are needed (Settings → Secrets and variables → Actions):
-
-| Secret | Value |
-|---|---|
-| `KEYSTORE_BASE64` | base64 of your keystore: `[Convert]::ToBase64String([IO.File]::ReadAllBytes("your.jks"))` |
-| `KEYSTORE_PASSWORD` | the keystore password |
-
-With those unset the workflow **fails on purpose** — publishing an unsigned or debug-signed
-release would be worse than not publishing one.
-
-**To review before going public**: run the `Release` workflow manually from the Actions tab,
-give it a tag and tick `draft`. It builds, signs and uploads the APK as usual, but the release
-stays a draft only you can see; press **Publish release** on the release page when you are happy
-with it.
-
-The APK's `versionName` / `versionCode` are derived from git at build time (see
-[`app/build.gradle.kts`](app/build.gradle.kts)), so **tagging is enough** — there is no version
-to bump by hand, and a tag can never disagree with the version inside the APK.
 
 ## Install and use
 
 1. Install the APK and enable the module in your framework (LSPosed).
-2. **Tick the scope the module recommends** (`scope.list` contains `system`).
+2. **Tick the scope the module recommends.**
    Its display name differs between frameworks and ROMs — commonly "System", sometimes
    "System Framework", or the literal `system`. Missing it makes the module fail
    **silently**: the UI still reports "active" while nothing is intercepted.
@@ -140,9 +73,9 @@ On Android 12 and below the entry is greyed out rather than offering a switch th
 Every option keeps a recognisable word in any UI language (`Language` / `Follow system`, or the
 language's own name), so a user who lands in a language they cannot read can still find the way out.
 
-## Debugging
+## Reporting a problem
 
-Loading and hit logs go to logcat under the tag `HideAccessibility`:
+Logs go to logcat under the tag `HideAccessibility`:
 
 ```bash
 adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibility.Hooks:V
@@ -150,10 +83,9 @@ adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibil
 
 - `HideAccessibility.Diagnostics` — hook install result, config channel state, the active hidden list
 - `HideAccessibility.Hooks` — the calling package, logged on the first hit
-- `HideAccessibility.PackageNames` — which path resolved UID → package name (a failed resolution
-  means "do not intercept", with a warning)
 
 **Reading `system_server` logs requires root**; a non-root `adb shell` cannot see them.
+When reporting an issue, attaching an LSPosed log export makes it much easier to diagnose.
 
 ## What this module can and cannot do
 
@@ -181,7 +113,3 @@ adb logcat -s HideAccessibility:V HideAccessibility.Diagnostics:V HideAccessibil
 This project is a **derived work** of a GPL-3.0 project and is therefore released under
 GPL-3.0 as well. That makes it **copyleft**: redistributing it, with or without changes,
 requires passing on the same license and making the corresponding source available.
-
-Runtime dependencies are Apache-2.0 (`io.github.libxposed:api` / `service`, Kotlin standard
-library). Apache-2.0 is compatible with GPL-3.0 — the combination may be distributed under
-GPL-3.0, and the Apache-2.0 notices are preserved in each dependency's own `LICENSE`.
