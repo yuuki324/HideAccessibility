@@ -6,5 +6,7 @@
         <item name="android:statusBarColor">@color/bg_dark</item>
         <item name="android:navigationBarColor">@color/bg_dark</item>
         <item name="android:windowLightStatusBar">false</item>
+        <!-- 深色背景 -> 导航栏用浅色图标。API 27+，与 minSdk 一致。 -->
+        <item name="android:windowLightNavigationBar">false</item>
     </style>
 </resources>

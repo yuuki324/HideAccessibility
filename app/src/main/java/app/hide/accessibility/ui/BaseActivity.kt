@@ -21,59 +21,31 @@
 package app.hide.accessibility.ui
 
 import android.app.Activity
-import android.os.Build
 import android.os.Bundle
-import android.view.View
-import android.view.WindowInsetsController
-import app.hide.accessibility.R
 
 /**
- * 极简基类：只做状态栏配色，不引入 androidx。
+ * 极简基类：不引入 androidx，系统栏完全交给主题。
  *
- * 用 framework 的 `Theme.DeviceDefault.DayNight`（见 res/values/themes.xml），
+ * 用 framework 的 `Theme.DeviceDefault.DayNight`（见 res/values/themes.xml 与 values-night），
  * 深浅色跟随系统，不需要 AppCompatDelegate。
  *
- * 状态栏图标亮暗走 [WindowInsetsController]（API 30+）。旧的
- * `View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR` 已弃用，仅为 API 27~29 保留。
+ * 这里刻意**不**在代码里设置状态栏/导航栏的颜色与图标亮暗：
+ *
+ *  - `Window.setStatusBarColor` / `setNavigationBarColor` 自 API 35 起已弃用——系统强制
+ *    edge-to-edge 后，颜色由主题决定，代码设置在较新系统上不再生效；
+ *  - `View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR` 自 API 30 起已弃用。
+ *
+ * 主题里已有 `statusBarColor` / `navigationBarColor` / `windowLightStatusBar` /
+ * `windowLightNavigationBar` 四项，随 day/night 自动切换，效果与按 API 逐个分支设置一致，
+ * 而且不产生弃用调用。minSdk 27 正好满足 `windowLightNavigationBar`（API 27+）的要求。
  */
 abstract class BaseActivity : Activity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        applySystemBars()
         onCreate()
     }
 
     /** 子类在这里 setContentView + 初始化 */
     abstract fun onCreate()
-
-    val isNightMode: Boolean
-        get() = (resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK) ==
-            android.content.res.Configuration.UI_MODE_NIGHT_YES
-
-    private fun applySystemBars() {
-        runCatching {
-            val bg = if (isNightMode) R.color.bg_dark else R.color.bg
-            window.statusBarColor = getColor(bg)
-            window.navigationBarColor = getColor(bg)
-
-            // 浅色背景需要深色状态栏图标，深色背景反之
-            val lightIcons = !isNightMode
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-                window.insetsController?.setSystemBarsAppearance(
-                    if (lightIcons) WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS else 0,
-                    WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS,
-                )
-            } else {
-                @Suppress("DEPRECATION")
-                val flags = window.decorView.systemUiVisibility
-                @Suppress("DEPRECATION")
-                window.decorView.systemUiVisibility = if (lightIcons) {
-                    flags or View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR
-                } else {
-                    flags and View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR.inv()
-                }
-            }
-        }
-    }
 }
