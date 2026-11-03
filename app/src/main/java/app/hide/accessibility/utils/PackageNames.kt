@@ -23,6 +23,7 @@ package app.hide.accessibility.utils
 import android.os.Binder
 import android.util.Log
 import app.hide.accessibility.Const
+import app.hide.accessibility.hook.ModuleLog
 import java.lang.reflect.Method
 import java.util.concurrent.ConcurrentHashMap
 
@@ -126,7 +127,7 @@ object PackageNames {
         }
         if (resolutionPath == "unresolved") {
             resolutionPath = "UNAVAILABLE"
-            Log.w(TAG, "cannot resolve UID to package name; nothing will be hidden")
+            ModuleLog.w(TAG, "cannot resolve UID to package name; nothing will be hidden")
         }
         return null
     }
@@ -140,7 +141,7 @@ object PackageNames {
         holder = pm
         getPackagesForUid = method
         resolutionPath = via
-        Log.i(TAG, "resolver ready via $via")
+        ModuleLog.i(TAG, "resolver ready via $via")
         method
     }.onFailure { lastError = "bind($via): $it" }.getOrNull()
 }

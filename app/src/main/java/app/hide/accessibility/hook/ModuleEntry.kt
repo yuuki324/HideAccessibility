@@ -43,11 +43,14 @@ import app.hide.accessibility.data.ConfigStore
 class ModuleEntry : XposedModule() {
 
     override fun onModuleLoaded(param: XposedModuleInterface.ModuleLoadedParam) {
-        Log.i(Const.TAG, "module loaded: process=${param.processName} systemServer=${param.isSystemServer}")
+        // 必须最先登记：下面这条日志就要写进框架日志。框架在每个被注入的进程都会回调，
+        // 所以登记一定发生在任何 hook 日志之前。
+        ModuleLog.attach(this)
+        ModuleLog.i(Const.TAG, "module loaded: process=${param.processName} systemServer=${param.isSystemServer}")
     }
 
     override fun onSystemServerStarting(param: XposedModuleInterface.SystemServerStartingParam) {
-        Log.i(Const.TAG, "system_server starting, framework api=${apiVersion}, ${frameworkName} ${frameworkVersion}")
+        ModuleLog.i(Const.TAG, "system_server starting, framework api=${apiVersion}, ${frameworkName} ${frameworkVersion}")
 
         // 配置通道与 hook 安装各自 try：配置读不到时仍要能报出"模块已加载 + hook 结果"
         var configNote = "ok via getRemotePreferences"
@@ -55,11 +58,11 @@ class ModuleEntry : XposedModule() {
             ConfigStore.listen(getRemotePreferences(Const.CONFIG_PREFS_NAME))
         }.onFailure {
             configNote = "FAILED ${it.javaClass.simpleName}: ${it.message}"
-            Log.e(Const.TAG, "remote preferences unavailable: ${it.message}")
+            ModuleLog.e(Const.TAG, "remote preferences unavailable: ${it.message}")
         }
 
         val hookResult = runCatching { FrameworkHooks(this, param.classLoader).install() }
-            .onFailure { Log.e(Const.TAG, "install hooks failed", it) }
+            .onFailure { ModuleLog.e(Const.TAG, "install hooks failed", it) }
             .getOrElse { "install threw: ${it.javaClass.simpleName}: ${it.message}" }
 
         Diagnostics.reportInstalled(hookResult, configNote)
@@ -68,7 +71,7 @@ class ModuleEntry : XposedModule() {
     override fun onPackageLoaded(param: XposedModuleInterface.PackageLoadedParam) {
         // 作用域只有 system，正常不会走到这里；
         // 万一用户把模块勾到了别的应用上，也不要产生任何副作用。
-        Log.i(Const.TAG, "onPackageLoaded(${param.packageName}) ignored")
+        ModuleLog.i(Const.TAG, "onPackageLoaded(${param.packageName}) ignored")
     }
 
     /**
@@ -80,6 +83,6 @@ class ModuleEntry : XposedModule() {
     override fun onHotReloading(param: XposedModuleInterface.HotReloadingParam): Boolean = false
 
     override fun onHotReloaded(param: XposedModuleInterface.HotReloadedParam) {
-        Log.i(Const.TAG, "hot reloaded (api=${apiVersion}, priority=${XposedInterface.PRIORITY_HIGHEST})")
+        ModuleLog.i(Const.TAG, "hot reloaded (api=${apiVersion}, priority=${XposedInterface.PRIORITY_HIGHEST})")
     }
 }

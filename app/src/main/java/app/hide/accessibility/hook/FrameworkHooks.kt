@@ -73,7 +73,7 @@ class FrameworkHooks(
     private fun hookAccessibilityManagerService(): String {
         val clazz = findClass("com.android.server.accessibility.AccessibilityManagerService")
         if (clazz == null) {
-            Log.e(tag, "AccessibilityManagerService not found; hooks NOT installed")
+            ModuleLog.e(tag, "AccessibilityManagerService not found; hooks NOT installed")
             return "AMS: class not found"
         }
 
@@ -116,15 +116,15 @@ class FrameworkHooks(
     private fun hookContentProviderTransport(): String {
         val clazz = findClass("android.content.ContentProvider\$Transport")
         if (clazz == null) {
-            Log.e(tag, "ContentProvider\$Transport not found; Settings.Secure hook NOT installed")
+            ModuleLog.e(tag, "ContentProvider\$Transport not found; Settings.Secure hook NOT installed")
             return "Transport: class not found"
         }
         val candidates = clazz.declaredMethods.filter { it.name == "call" && it.returnType == Bundle::class.java }
         if (candidates.isEmpty()) {
-            Log.e(tag, "ContentProvider\$Transport#call not found")
+            ModuleLog.e(tag, "ContentProvider\$Transport#call not found")
             return "Transport: no call()"
         }
-        Log.i(tag, "Transport#call candidates: " + candidates.joinToString { signatureOf(it) })
+        ModuleLog.i(tag, "Transport#call candidates: " + candidates.joinToString { signatureOf(it) })
         val hooked = mutableListOf<String>()
         candidates.forEach { method ->
             if (method.parameterTypes.none { it == String::class.java }) return@forEach
@@ -160,7 +160,7 @@ class FrameworkHooks(
 
         val caller = blockedCallerOrNull()
         if (probeBudget.getAndUpdate { if (it > 0) it - 1 else it } > 0) {
-            Log.i(tag, "GET_secure key=$key caller=${CallerGuard.lastCaller ?: "?"} blocked=${caller != null}")
+            ModuleLog.i(tag, "GET_secure key=$key caller=${CallerGuard.lastCaller ?: "?"} blocked=${caller != null}")
         }
         if (caller == null) return result
 
@@ -178,7 +178,7 @@ class FrameworkHooks(
     private fun blockedCallerOrNull(): String? = CallerGuard.blockedCallerOrNull()
 
     private fun findClass(name: String): Class<*>? = runCatching { Class.forName(name, false, classLoader) }
-        .onFailure { Log.w(tag, "Class.forName($name) failed: ${it.message}") }
+        .onFailure { ModuleLog.w(tag, "Class.forName($name) failed: ${it.message}") }
         .getOrNull()
 
     private inline fun hookMethod(
@@ -190,7 +190,7 @@ class FrameworkHooks(
     ): String {
         val match = clazz.declaredMethods.firstOrNull { it.name == name && it.parameterCount == paramCount && accept(it.parameterTypes) }
         if (match == null) {
-            Log.e(tag, "$name/$paramCount not found in ${clazz.name}; candidates: " +
+            ModuleLog.e(tag, "$name/$paramCount not found in ${clazz.name}; candidates: " +
                 clazz.declaredMethods.filter { it.name == name }.joinToString { signatureOf(it) })
             return "$name:MISSING"
         }
@@ -207,14 +207,14 @@ class FrameworkHooks(
                         body(chain)
                     } catch (t: Throwable) {
                         // 兜底：拦截逻辑出错时退回原实现，绝不让异常冒到 framework
-                        Log.e(tag, "hook body failed for ${signatureOf(executable)}", t)
+                        ModuleLog.e(tag, "hook body failed for ${signatureOf(executable)}", t)
                         chain.proceed()
                     }
                 }
-            Log.i(tag, "hooked ${signatureOf(executable)}")
+            ModuleLog.i(tag, "hooked ${signatureOf(executable)}")
             return true
         } catch (t: Throwable) {
-            Log.e(tag, "hook ${signatureOf(executable)} failed", t)
+            ModuleLog.e(tag, "hook ${signatureOf(executable)} failed", t)
             return false
         }
     }

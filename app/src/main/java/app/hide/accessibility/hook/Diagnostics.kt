@@ -43,11 +43,11 @@ object Diagnostics {
 
     /** 记录"模块确实被加载进 system_server 了"以及 hook 安装结果 */
     fun reportInstalled(hookResult: String, configNote: String) {
-        Log.i(TAG, "system_server loaded: pid=${android.os.Process.myPid()}")
-        Log.i(TAG, "hooks: $hookResult")
-        Log.i(TAG, "config: $configNote")
-        Log.i(TAG, "blocked(${ConfigStore.blockedSnapshot().size}): ${ConfigStore.blockedSnapshot().sorted()}")
-        Log.i(TAG, PackageNames.debugSnapshot())
+        ModuleLog.i(TAG, "system_server loaded: pid=${android.os.Process.myPid()}")
+        ModuleLog.i(TAG, "hooks: $hookResult")
+        ModuleLog.i(TAG, "config: $configNote")
+        ModuleLog.i(TAG, "blocked(${ConfigStore.blockedSnapshot().size}): ${ConfigStore.blockedSnapshot().sorted()}")
+        ModuleLog.i(TAG, PackageNames.debugSnapshot())
     }
 
     private var lastTouch = 0L
@@ -57,6 +57,6 @@ object Diagnostics {
         val now = System.currentTimeMillis()
         if (now - lastTouch < 5_000) return
         lastTouch = now
-        Log.i(TAG, "$hook masked for $pkg (queries=${CallerGuard.queries.get()} hits=${CallerGuard.hits.get()})")
+        ModuleLog.i(TAG, "$hook masked for $pkg (queries=${CallerGuard.queries.get()} hits=${CallerGuard.hits.get()})")
     }
 }
