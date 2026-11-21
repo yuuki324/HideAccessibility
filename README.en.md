@@ -37,8 +37,10 @@ accessibility features and any app you did not select are unaffected.
   or `getEnabledAccessibilityServiceList()`, or reads `Settings.Secure.ACCESSIBILITY_ENABLED` /
   `ENABLED_ACCESSIBILITY_SERVICES`, it gets "accessibility is off".
 - **Only the caller sees a false state.** The decision is based on `Binder.getCallingUid()`, not a global switch.
-- **On-device self-check.** The main screen shows live values from both intercepted paths, so
-  selecting the module itself is enough to verify the hooks work.
+- **On-device self-check.** Opening the main screen verifies once that the hooks really work:
+  the module temporarily adds itself to the hidden list, reads the accessibility state, then
+  **writes the user's own list straight back**. The screen also shows live values from both
+  intercepted paths.
 - **Localised UI.** Simplified Chinese, Traditional Chinese and English, switchable in-app on Android 13+.
 
 ## Requirements
@@ -63,10 +65,15 @@ accessibility features and any app you did not select are unaffected.
 3. Open the module → "Manage hidden apps" → select the target apps.
 4. Start (or restart) the target app. It will believe accessibility is off.
 
-> **Verify it works:** the "Current device state" section on the main screen shows the two
-> intercepted paths. Tick the module's **own** package name and that section will report
-> "not enabled / empty list"; untick it and you get the real device values.
-> If both readings follow the tick, the hooks are working.
+> **Verify it works:** opening the main screen self-checks once — the module temporarily adds
+> itself to the hidden list, checks whether the readings turn into "not enabled", then puts your
+> own list straight back (an interrupted self-check is restored on the next launch too).
+> When the self-check fails, the status title says so.
+> You can also check by hand: the "Current device state" section shows the two intercepted
+> paths. Tick the module's **own** package name and it reports "not enabled / empty list";
+> untick it and you get the real device values.
+> The hidden list starts empty (only the apps you tick are hidden), so hiding the module
+> itself is your choice.
 
 ## Language
 

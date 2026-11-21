@@ -12,20 +12,59 @@
     <string name="status_activated">模組已啟用</string>
     <string name="status_not_activated">模組未啟用（請在 LSPosed 中啟用本模組，並勾選它建議的適用範圍，然後重新啟動）</string>
     <string name="status_scope_missing">模組已啟用，但適用範圍內缺少「建議的適用範圍」那一項（名稱因 LSPosed 版本而異，通常顯示為「系統」）</string>
+    <!-- 框架服務連得上，但模組自己問無障礙仍然得到「開著」——代表 hook 根本沒裝上，
+         這時候報「已啟用」就是假啟用。 -->
+    <string name="status_self_check_failed">模組已連線框架，但自我檢查未通過——hook 可能沒有生效。請檢查適用範圍是否勾選「系統」，以及啟用後是否重新啟動過手機。</string>
+    <!-- 框架服務連上了，但 system_server 對探針始終沒有回應：模組沒被載入進去
+         （或 Settings hook 沒裝上）。這是「顯示已啟用、所有應用程式卻照樣偵測得到」最常見的原因。 -->
+    <string name="status_server_unreachable">模組已啟用，但 system_server 沒有回應——它很可能沒有載入本模組。如果是在本次開機之後安裝或更新的，請重新啟動手機後再看。</string>
+    <string name="status_hook_failed">模組已啟用、system_server 也有回應，但有一個或多個 hook 沒有裝上。請複製下面的診斷資訊回報。</string>
     <string name="status_framework">運行框架：%1$s %2$s（API %3$d）</string>
     <string name="status_system">系統版本：%1$s</string>
     <string name="status_module">模組版本：%1$s</string>
+    <string name="label_server_state">system_server：%1$s</string>
+    <string name="server_loaded">已載入（pid %1$d）</string>
+    <string name="server_not_loaded">未載入——hook 沒有回應</string>
     <!-- 模組是在本次開機之後安裝/更新時顯示。LSPosed 只在行程啟動時載入模組，
          system_server 開機後常駐，所以必須重新啟動才會用上新程式碼。 -->
     <string name="warning_need_reboot">⚠ 本模組是在本次開機之後安裝/更新的，目前系統還沒載入它。重新啟動手機後才會生效。</string>
+    <!-- 同一種情況，但 system_server 裡還在跑更新前的實例（探針有回應）。
+         重裝 APK 只換了 App 側程式碼，注入進 system_server 的那份要重新啟動才會更新。 -->
+    <string name="warning_need_reboot_loaded">⚠ 本模組是在本次開機之後安裝/更新的。system_server 裡運行的仍是更新前的實例，它的隱藏清單和自我檢查讀數可能與目前介面不一致。重新啟動手機後恢復同步。</string>
 
     <string name="button_manage_apps">管理已隱藏的應用程式</string>
     <string name="switch_hide_icon">隱藏桌面圖示</string>
     <string name="link_project">專案主頁</string>
 
     <string name="group_self_check">目前裝置實際狀態（自我檢查用）</string>
-    <string name="label_accessibility_state">AccessibilityManager</string>
-    <string name="label_settings_secure">Settings.Secure</string>
+    <string name="label_accessibility_state">AccessibilityManager —— 應用程式查詢無障礙狀態的介面</string>
+    <string name="label_settings_secure">Settings.Secure —— 應用程式讀取的那條系統設定</string>
+    <!-- 讀的是真正執行隱藏的那一側（system_server），而不是本應用程式問系統時被告知的內容。
+         兩邊對不上，才能把「設定沒送到」和「hook 沒生效」區分開。 -->
+    <string name="label_system_server_side">system_server 側 —— 真正執行隱藏的那一側（自我檢查探針）</string>
+    <!-- 沒有回應代表模組在 system_server 裡的那條 Settings hook 沒在跑：
+         要嘛模組沒被載入（安裝/更新 APK 後需要重新啟動手機），要嘛 hook 安裝失敗。 -->
+    <string name="probe_no_answer">system_server 側沒有任何回應。\n\n這代表模組在 system_server 裡的那條 Settings hook 沒有在跑：要嘛模組沒被載入（安裝或更新 APK 後需要重新啟動手機），要嘛 hook 安裝失敗。\n\n請點下面的「複製診斷資訊」把文字傳給開發者。</string>
+    <!-- 一個 hook 一行，後面直接寫這個 hook 是幹什麼的：
+         即使不知道 addClient 是什麼，也能看出是哪一層沒裝上。 -->
+    <string name="probe_hook_add_client">addClient: %1$s — 應用程式註冊無障礙用戶端時，系統會回「無障礙沒開」</string>
+    <string name="probe_hook_service_list">getEnabledAccessibilityServiceList: %1$s — 應用程式查「已啟用哪些無障礙服務」時回空清單</string>
+    <string name="probe_hook_transport">Transport.call: %1$s — 應用程式讀 Settings.Secure 時把回傳值改掉</string>
+    <string name="hook_status_ok">已裝上</string>
+    <string name="hook_status_missing">方法沒找到</string>
+    <string name="hook_status_failed">安裝失敗</string>
+    <string name="hook_status_class_missing">類別沒找到</string>
+    <string name="hook_status_unknown">未確認</string>
+    <string name="probe_pid">pid: %1$d — system_server 的行程號</string>
+    <string name="probe_blocked">生效的隱藏清單: %1$d 個 — system_server 裡真正在攔的清單，不是介面上的勾選數</string>
+    <string name="probe_counters">queries/hits: %1$d / %2$d — hook 被呼叫 %1$d 次，其中 %2$d 次判定為要隱藏</string>
+    <string name="probe_resolver">套件名稱解析: %1$s — UID 換套件名稱走的入口</string>
+    <string name="probe_list_compare">隱藏清單：介面 %1$d 個 / system_server 生效 %2$d 個</string>
+    <string name="probe_list_out_of_sync">不一致——設定沒有送達 system_server，安裝/更新後請重新啟動手機</string>
+    <string name="probe_line_raw">原始回應：</string>
+    <string name="button_copy_diagnostics">複製診斷資訊</string>
+    <string name="diag_copied">診斷資訊已複製到剪貼簿</string>
+    <string name="diag_copy_failed">複製失敗：%1$s</string>
 
     <!-- Keep the English word in EVERY translation of this label: if the app ever shows
          a language the user cannot read, "Language" is how they find their way back. -->

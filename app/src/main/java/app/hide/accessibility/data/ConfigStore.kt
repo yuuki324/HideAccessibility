@@ -22,6 +22,7 @@ package app.hide.accessibility.data
 
 import android.content.Context
 import android.content.SharedPreferences
+import android.os.SystemClock
 import android.util.Log
 import io.github.libxposed.service.XposedService
 import app.hide.accessibility.Const
@@ -64,7 +65,7 @@ object ConfigStore {
             channelState = "框架服务未绑定 → 无法读写配置"
             return false
         }
-        return runCatching {
+        val ok = runCatching {
             remotePrefs = service.getRemotePreferences(Const.CONFIG_PREFS_NAME)
             channelState = "remote preferences(${Const.CONFIG_PREFS_NAME})"
             true
@@ -73,32 +74,61 @@ object ConfigStore {
             channelState = "取 remote preferences 失败: ${it.message}"
             Log.e(Const.TAG, "getRemotePreferences failed", it)
         }.getOrDefault(false)
+        // 上一次进程里的自检可能没跑完（临时把模块自己加进了隐藏列表就再没回来），
+        // 接上通道时还原它。**只在第一次成功绑定时做**：绑定会被反复调用（每次回前台都走一遍
+        // observe），而自检进行中也可能正好走到这里——那时还原等于把自检的半成品当成用户设置。
+        if (ok && !recoveryAttempted) {
+            recoveryAttempted = true
+            recoverInterruptedSelfCheck()
+        }
+        return ok
     }
 
-    /** 被 hook 进程侧登记句柄（system_server 由框架注入） */
-    fun listen(prefs: SharedPreferences) {
+    @Volatile
+    private var recoveryAttempted = false
+
+    /**
+     * 被 hook 进程侧登记句柄（system_server 由框架注入）。
+     *
+     * 传的是**取用的动作**而不是一个现成的 SharedPreferences：框架的变更通知不保证一定送到
+     * 被注入的进程（见 [forceReload]），所以这里必须留着"重新向框架要一次"的能力。
+     *
+     * 返回是否拿到了配置通道——拿不到时界面与日志要能看出"这份配置根本没人读"。
+     */
+    fun listen(provider: () -> SharedPreferences): Boolean {
+        remoteProvider = provider
+        val prefs = runCatching { provider() }
+            .onFailure { Log.e(Const.TAG, "getRemotePreferences failed", it) }
+            .getOrNull() ?: return false
         remote = prefs
         reload(prefs)
-        prefs.registerOnSharedPreferenceChangeListener { _, key ->
-            if (key == null || key == Const.KEY_BLOCK_APPS) reload(prefs)
-        }
+        runCatching {
+            prefs.registerOnSharedPreferenceChangeListener { _, key ->
+                // 变更通知线程和 Binder 线程都会重读，重读必须在同一把锁里做：
+                // reload 内部是"清空 + 重新填充"，两个线程交错会让某次判定读到半个列表。
+                if (key == null || key == Const.KEY_BLOCK_APPS) {
+                    synchronized(reloadLock) { reload(freshRemote() ?: prefs) }
+                }
+            }
+        }.onFailure { Log.w(Const.TAG, "listener registration failed: ${it.message}") }
+        return true
     }
+
+    /** 取 remote preferences 的动作（hook 进程侧由框架注入） */
+    @Volatile
+    private var remoteProvider: (() -> SharedPreferences)? = null
 
     /** 在 system_server 里读到的隐藏列表 */
     @Volatile
     private var remote: SharedPreferences? = null
 
-    /** 当前是否拿得到配置通道 */
-    val isWritable: Boolean get() = appWriter != null
-
     /**
-     * App 侧用来写入的句柄。
+     * App 侧是否已经接上框架通道。
      *
-     * 关键点：**优先用 remote preferences**；只有在框架服务不可用时才退回本地文件，
-     * 并且把这件事写进 [channelState]，让界面能提示"配置不会生效"。
+     * 只有接上了写入才会真的到达 system_server；没接上时最多写本地兜底文件（没有人读它），
+     * 所以涉及"临时改隐藏列表"的自检必须先问这个，宁可放弃自检也不能写一份没人读的配置。
      */
-    @Volatile
-    private var appWriter: SharedPreferences? = null
+    val hasChannel: Boolean get() = remotePrefs != null
 
     @Volatile
     private var appFallback: SharedPreferences? = null
@@ -107,12 +137,23 @@ object ConfigStore {
         appFallback = context.getSharedPreferences(Const.LEGACY_PREFS_NAME, Context.MODE_PRIVATE)
     }
 
-    /** App 侧当前隐藏列表 */
+    /**
+     * App 侧当前隐藏列表。
+     *
+     * 读不到就是**空集**。这里以前返回 `{模块自己的包名}` 兜底，结果是：
+     *
+     *  - App 侧把"从没配置过"显示成"模块自己已被勾选"，用户点一下取消勾选，写出去的是空集；
+     *  - system_server 侧又用同一个默认值把空集当成"没有这个键"，
+     *  - 于是模块自己始终留在生效列表里，主界面两条读数**永远**是"没开无障碍"，
+     *    用户怎么勾怎么取消都看不出变化——而这正是那段自检读数存在的意义。
+     *
+     * 空集与"没有这个键"语义一致，两侧不再有歧义；要不要隐藏模块自己由用户自己勾。
+     */
     fun read(context: Context): Set<String> {
         val src = remotePrefs ?: appFallback
             ?: context.getSharedPreferences(Const.LEGACY_PREFS_NAME, Context.MODE_PRIVATE)
         return runCatching { src.getStringSet(Const.KEY_BLOCK_APPS, null) }.getOrNull()?.toHashSet()
-            ?: defaultBlocked
+            ?: emptySet()
     }
 
     /**
@@ -136,24 +177,148 @@ object ConfigStore {
     }
 
     /** system_server 侧当前生效的隐藏列表 */
-    fun blockedSnapshot(): Set<String> = HashSet(blocked)
+    fun blockedSnapshot(): Set<String> = HashSet(freshBlocked())
 
     fun isBlocked(packageName: String?): Boolean =
-        packageName != null && packageName.isNotEmpty() && blocked.contains(packageName)
+        packageName != null && packageName.isNotEmpty() && freshBlocked().contains(packageName)
 
     // ------------------------------------------------------------------ system_server 侧状态
 
     private val blocked: MutableSet<String> = ConcurrentHashMap.newKeySet()
 
-    /** 兜底默认值：只隐藏模块自己 */
-    private val defaultBlocked: Set<String> = setOf(Const.MODULE_PACKAGE)
+    /**
+     * 兜底默认值：什么都不隐藏。
+     *
+     * 这里以前是 `{模块自己的包名}`，导致"从没配置过"和"用户把模块自己加了进去"在
+     * system_server 侧无法区分，模块自己于是被永久当成拦截对象（详见 [read] 的说明）。
+     */
+    private val defaultBlocked: Set<String> = emptySet()
+
+    /**
+     * 生效列表的最长可信时间。
+     *
+     * 配置变更靠框架的 SharedPreferences 变更通知送达，但**不能假设它一定送达**：
+     * 只要有一条没到，system_server 就会一直按旧列表拦截，而界面上显示的勾选状态
+     * 来自 App 侧自己的读取——两者不一致时，用户看到的是"我明明取消了勾选，
+     * 读数却还是没开无障碍"。所以判定时顺带检查一下有效期，过期就重读一次。
+     *
+     * 400ms 的取舍：够短，自检的轮询（100ms 一次、2s 超时）能在窗口内看到变化；
+     * 又够长，正常使用时最多每 400ms 读一次 remote preferences，不至于在
+     * Binder 调用路径上引入可观开销。
+     */
+    private const val RELOAD_TTL_MS = 400L
+
+    @Volatile
+    private var loadedAt = 0L
+
+    private val reloadLock = Any()
+
+    /**
+     * 拿当前生效的隐藏列表，必要时重读。
+     *
+     * 双检：先做一次无锁的过期判断（绝大多数调用都走这条路，只是两个 volatile 读），
+     * 过期了才进锁重读，避免多个 Binder 线程同时读同一份 prefs。
+     */
+    private fun freshBlocked(): Set<String> {
+        if (remote == null && remoteProvider == null) return blocked
+        if (SystemClock.elapsedRealtime() - loadedAt < RELOAD_TTL_MS) return blocked
+        synchronized(reloadLock) {
+            if (SystemClock.elapsedRealtime() - loadedAt < RELOAD_TTL_MS) return blocked
+            val prefs = freshRemote() ?: return blocked
+            reload(prefs)
+        }
+        return blocked
+    }
+
+    /**
+     * 强制重新向框架取一次配置并重读。**由模块 App 侧主动触发**（它每次问自检探针时顺带来一发）。
+     *
+     * 为什么需要这条路：配置变更靠框架的 SharedPreferences 变更通知送达，通知一旦没到，
+     * system_server 就会一直按旧列表拦截，而模块 App 读自己的写入永远是"成功"的——
+     * 表现就是"界面里明明取消了勾选，被隐藏的应用（包括模块自己）却还是看不到无障碍状态"。
+     * 与其等一个不保证会到的通知，不如让 App 每次打开界面/跑自检时就催一次。
+     */
+    fun forceReload() {
+        val prefs = freshRemote() ?: return
+        synchronized(reloadLock) { reload(prefs) }
+        Log.i(Const.TAG, "config reloaded on request: ${blocked.size} package(s)")
+    }
+
+    /** 重新向框架要一次 remote preferences；拿不到就退回上次那份 */
+    private fun freshRemote(): SharedPreferences? =
+        runCatching { remoteProvider?.invoke() }.getOrNull() ?: remote
 
     private fun reload(prefs: SharedPreferences) {
         val snapshot = runCatching { prefs.getStringSet(Const.KEY_BLOCK_APPS, defaultBlocked) }
             .getOrNull() ?: defaultBlocked
         blocked.clear()
         blocked.addAll(snapshot)
+        loadedAt = SystemClock.elapsedRealtime()
         Log.i(Const.TAG, "block list reloaded: ${blocked.size} package(s)")
+    }
+
+    // ------------------------------------------------------------------ 自检期间临时改列表
+
+    /**
+     * 自检备份键。
+     *
+     * 写在 remote preferences 里而不是内存里，就是为了跨进程被杀也能还原；
+     * 前缀用下划线，与用户数据的键区分开，`exportXml` 也只导出 [Const.KEY_BLOCK_APPS]。
+     */
+    private const val KEY_SELF_CHECK_BACKUP = "_self_check_backup"
+
+    /**
+     * 开始一次自检：把**用户当前的列表**备份进 remote preferences，同时换上自检要用的临时列表。
+     *
+     * 备份不是可有可无的：自检必须临时把模块自己加进隐藏列表，而这一步一旦在还原之前
+     * 进程被杀（用户划掉后台、系统回收），用户自己的列表就永久留在被改过的状态。
+     * 备份写在同一份 remote preferences 里，下次启动就能还原（见 [recoverInterruptedSelfCheck]）。
+     *
+     * 返回 false 表示通道不可用（或写入失败），调用方必须放弃自检——**绝不能**只写本地兜底文件。
+     */
+    fun beginSelfCheck(userList: Set<String>, probeList: Set<String>): Boolean {
+        val target = remotePrefs ?: return false
+        return runCatching {
+            target.edit()
+                .putStringSet(KEY_SELF_CHECK_BACKUP, HashSet(userList))
+                .putStringSet(Const.KEY_BLOCK_APPS, HashSet(probeList))
+                .commit()
+        }.onFailure { Log.e(Const.TAG, "beginSelfCheck failed", it) }
+            .getOrDefault(false)
+    }
+
+    /** 结束自检：写回用户列表，并清掉备份。返回是否成功写回。 */
+    fun endSelfCheck(userList: Set<String>): Boolean {
+        val target = remotePrefs ?: return false
+        return runCatching {
+            target.edit()
+                .putStringSet(Const.KEY_BLOCK_APPS, HashSet(userList))
+                .remove(KEY_SELF_CHECK_BACKUP)
+                .commit()
+        }.onFailure { Log.e(Const.TAG, "endSelfCheck failed", it) }
+            .getOrDefault(false)
+    }
+
+    /**
+     * 还原被中断的自检。返回是否**真的**还原过（调用方据此打日志）。
+     *
+     * 判据就是那份备份：只有自检走到了写备份那一步、却没走到清理，它才会存在。
+     */
+    fun recoverInterruptedSelfCheck(): Boolean {
+        val target = remotePrefs ?: return false
+        val backup = runCatching { target.getStringSet(KEY_SELF_CHECK_BACKUP, null) }.getOrNull()
+            ?: return false
+        val restored = runCatching {
+            target.edit()
+                .putStringSet(Const.KEY_BLOCK_APPS, HashSet(backup))
+                .remove(KEY_SELF_CHECK_BACKUP)
+                .commit()
+        }.onFailure { Log.e(Const.TAG, "recoverInterruptedSelfCheck failed", it) }
+            .getOrDefault(false)
+        if (restored) {
+            Log.w(Const.TAG, "restored the hidden list from an interrupted self-check (${backup.size} package(s))")
+        }
+        return restored
     }
 
     // ------------------------------------------------------------------ 导入导出

@@ -49,6 +49,19 @@
                 android:layout_marginTop="4dp"
                 android:textColor="@color/text_secondary"
                 android:textSize="13sp" />
+
+            <!-- system_server 侧的状态单独一行。
+                 它与「模块已激活」是两件事：App 能连上框架服务只说明 lspd 在跑，
+                 而真正执行隐藏的 hook 在 system_server 里，没加载进去时这里会显示
+                 「not loaded / no answer」——这是本次反馈里最容易被忽略的一行。 -->
+            <TextView
+                android:id="@+id/status_server"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="13sp"
+                android:textStyle="bold" />
         </LinearLayout>
 
         <!-- 「装了/更新了但没重启」提示。
@@ -217,5 +230,44 @@
             android:textColor="@color/text_primary"
             android:textIsSelectable="true"
             android:textSize="12sp" />
+
+        <!-- system_server 侧的自检探针。
+             上面两块读的是"模块 App 自己问系统拿到什么"，这一块读的是"真正执行拦截的那一侧
+             怎么说"：hook 装上了什么、当前生效的隐藏列表、UID→包名解析走的哪条路。
+             没有回答就说明模块根本没被注入 system_server——这一条比任何间接推断都直接。 -->
+        <TextView
+            android:id="@+id/label_probe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/label_system_server_side"
+            android:textColor="@color/text_secondary"
+            android:textSize="12sp" />
+
+        <TextView
+            android:id="@+id/check_probe"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_card"
+            android:fontFamily="monospace"
+            android:padding="12dp"
+            android:textColor="@color/text_primary"
+            android:textIsSelectable="true"
+            android:textSize="12sp" />
+
+        <!-- 一键复制诊断：把「模块版本 / 框架 / 作用域 / 开机时长 / 是否开机后安装 /
+             system_server 探针回答」压成一段文本。反馈问题时粘贴这段就够了，
+             不需要再去 LSPosed 导一个可能被 logd 吞掉一半的日志包。 -->
+        <Button
+            android:id="@+id/button_copy_diag"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:background="@drawable/bg_button"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp"
+            android:text="@string/button_copy_diagnostics"
+            android:textAllCaps="false"
+            android:textColor="#FFFFFFFF" />
     </LinearLayout>
 </ScrollView>

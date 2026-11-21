@@ -11,21 +11,63 @@
     <string name="status_activated">Module is active</string>
     <string name="status_not_activated">Module not activated — enable it in LSPosed, tick its recommended scope, then reboot</string>
     <string name="status_scope_missing">Module is active, but the recommended scope is not ticked (its label differs between LSPosed builds; usually shown as “System”)</string>
+    <!-- The framework service is reachable, yet the module itself still sees accessibility as
+         enabled. That means the hook was never installed, so "active" would be a false report. -->
+    <string name="status_self_check_failed">Framework connected, but the self-check failed — the hook may not be in effect. Check that the scope is ticked and that the device was rebooted after enabling the module.</string>
+    <!-- Framework service is reachable but system_server never answered the probe: the module
+         is not loaded there (or the Settings hook failed). This is the most common reason a
+         module looks "active" yet every app still sees accessibility as enabled. -->
+    <string name="status_server_unreachable">Module is active, but system_server did not answer — it probably has not loaded the module. If it was installed or updated after the last boot, reboot and check again.</string>
+    <string name="status_hook_failed">Module is active and system_server answered, but one or more hooks failed to install. Copy the diagnostics below and report them.</string>
     <string name="status_framework">Framework: %1$s %2$s (API %3$d)</string>
     <string name="status_system">System: %1$s</string>
     <string name="status_module">Module version: %1$s</string>
+    <string name="label_server_state">system_server: %1$s</string>
+    <string name="server_loaded">loaded (pid %1$d)</string>
+    <string name="server_not_loaded">NOT loaded — the hook did not answer</string>
     <!-- Shown when the APK was installed or updated after the current boot. LSPosed loads
          modules when a process starts and system_server is long-lived, so new code is not
          picked up until the device is rebooted. -->
     <string name="warning_need_reboot">⚠ This module was installed or updated after the last boot, so the running system has not loaded it yet. Reboot the device for it to take effect.</string>
+    <!-- Same condition, but system_server still runs the pre-update instance (the probe answers).
+         Reinstalling the APK replaces the app-side code only; the injected copy lives until reboot. -->
+    <string name="warning_need_reboot_loaded">⚠ This module was installed or updated after the last boot. system_server is still running the pre-update instance, so its hidden list and self-check readings can disagree with this UI. Reboot to bring them back in sync.</string>
 
     <string name="button_manage_apps">Manage hidden apps</string>
     <string name="switch_hide_icon">Hide launcher icon</string>
     <string name="link_project">Project page</string>
 
     <string name="group_self_check">Current device state (self-check)</string>
-    <string name="label_accessibility_state">AccessibilityManager</string>
-    <string name="label_settings_secure">Settings.Secure</string>
+    <string name="label_accessibility_state">AccessibilityManager — the API apps query</string>
+    <string name="label_settings_secure">Settings.Secure — the setting apps read</string>
+    <!-- Reads the side that actually enforces the hiding (system_server) instead of what this app is
+         told when it asks. The two disagreeing is how "the config never arrived" is told apart from
+         "the hook is not in effect". -->
+    <string name="label_system_server_side">system_server side — what actually enforces the hiding (self-check probe)</string>
+    <!-- No answer means the module's Settings hook is not running inside system_server. This is
+         the direct signal that the module was not loaded there; the App-side "active" badge only
+         proves the framework service is reachable. -->
+    <string name="probe_no_answer">No answer from system_server.\n\nThis means the module\'s Settings hook is not running there: either the module was not loaded (installing or updating the APK requires a reboot), or the hook failed to install.\n\nTap “Copy diagnostics” below and send the text to the developer.</string>
+    <!-- One hook per line, each followed by what that hook actually does, so a user who has
+         never heard of addClient can still tell which layer failed to install. -->
+    <string name="probe_hook_add_client">addClient: %1$s — an app registering an accessibility client is told “accessibility is off”</string>
+    <string name="probe_hook_service_list">getEnabledAccessibilityServiceList: %1$s — an app asking which services are enabled gets an empty list</string>
+    <string name="probe_hook_transport">Transport.call: %1$s — an app reading Settings.Secure gets its values rewritten</string>
+    <string name="hook_status_ok">installed</string>
+    <string name="hook_status_missing">method not found</string>
+    <string name="hook_status_failed">install failed</string>
+    <string name="hook_status_class_missing">class not found</string>
+    <string name="hook_status_unknown">unknown</string>
+    <string name="probe_pid">pid: %1$d — system_server process id</string>
+    <string name="probe_blocked">effective hidden list: %1$d package(s) — what system_server actually enforces, not the ticks in this UI</string>
+    <string name="probe_counters">queries/hits: %1$d / %2$d — the hooks ran %1$d times and %2$d calls were judged as “should be hidden”</string>
+    <string name="probe_resolver">caller resolution: %1$s — how a calling UID is mapped to a package</string>
+    <string name="probe_list_compare">hidden list: UI has %1$d / system_server enforces %2$d</string>
+    <string name="probe_list_out_of_sync">OUT OF SYNC — the config has not reached system_server; reboot after installing or updating</string>
+    <string name="probe_line_raw">raw answer:</string>
+    <string name="button_copy_diagnostics">Copy diagnostics</string>
+    <string name="diag_copied">Diagnostics copied to clipboard</string>
+    <string name="diag_copy_failed">Could not copy: %1$s</string>
 
     <!-- Keep the English word in EVERY translation of this label: if the app ever shows
          a language the user cannot read, "Language" is how they find their way back. -->

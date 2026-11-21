@@ -45,6 +45,19 @@ object Const {
     /** 隐藏列表在 prefs 里的键名 */
     const val KEY_BLOCK_APPS = "_block_apps"
 
+    /**
+     * 自检探针键。
+     *
+     * 模块 App 拿它当 `Settings.Secure` 的键去读一次（`GET_secure`），system_server 侧的
+     * hook 认出这个键后**直接回一份自己的状态**：hook 装上了什么、当前生效的隐藏列表、
+     * UID→包名解析结果。系统设置里并不存在这个键，所以这条调用不会读到、也不会改到任何
+     * 真实设置；hook 侧只回答模块自己（其余调用方一律放行）。
+     *
+     * 存在的理由：界面上的勾选状态来自 App 侧的读取，而**真正执行拦截的那份列表在
+     * system_server 里**。两者不一致时，光看界面永远分不清"没生效"和"配置没送过去"。
+     */
+    const val PROBE_KEY = "_hide_accessibility_probe"
+
     /** 日志 TAG */
     const val TAG = "HideAccessibility"
 }

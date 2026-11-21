@@ -23,11 +23,11 @@ package app.hide.accessibility.hook
 import android.accessibilityservice.AccessibilityServiceInfo
 import android.os.BaseBundle
 import android.os.Bundle
-import android.util.Log
 import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
 import app.hide.accessibility.Const
 import app.hide.accessibility.data.ConfigStore
+import app.hide.accessibility.utils.PackageNames
 import java.lang.reflect.Executable
 import java.util.concurrent.atomic.AtomicInteger
 
@@ -61,11 +61,22 @@ class FrameworkHooks(
     /** GET_secure 的探测日志只打前 3 条，避免刷 log */
     private val probeBudget = AtomicInteger(3)
 
+    /**
+     * hook 安装结果，一行一条（分号分隔）。
+     *
+     * 只写日志的话，模块 App 想看"system_server 里到底装上了什么"就只能靠 root 读 logcat；
+     * 自检探针把它一并回传（见 [probeBundle]），界面上就能直接看到。
+     */
+    @Volatile
+    private var installedNote = "not installed"
+
     /** 装上 hook，并返回一份人类可读的安装结果（写进 logcat 诊断日志） */
     fun install(): String {
         val a11y = hookAccessibilityManagerService()
         val transport = hookContentProviderTransport()
-        return "accessibility=$a11y\ntransport=$transport"
+        val note = "accessibility=$a11y\ntransport=$transport"
+        installedNote = note.replace('\n', ';')
+        return note
     }
 
     // ------------------------------------------------------------ AccessibilityManagerService
@@ -141,10 +152,23 @@ class FrameworkHooks(
      *   call(String authority, String method, String arg, Bundle extras)                      -> 5 参含 this
      * 不靠位置硬猜，直接从 `chain.args` 里按类型取第一个 String 当 authority、第二个当 method、
      * 第三个当 arg。
+     *
+     * 自检探针（[Const.PROBE_KEY]）在**调用原实现之前**就返回：那个 key 在系统设置里并不存在，
+     * 让 SettingsProvider 去查一个不存在的键，行为随 ROM 而异（可能直接抛异常），没必要冒这个险。
      */
     private fun onSettingsCall(chain: XposedInterface.Chain): Any? {
-        val result = chain.proceed()
         val strings = chain.args.filterIsInstance<String>()
+        if (strings.size >= 3 && strings[0] == SETTINGS_AUTHORITY && strings[1] == CALL_METHOD_GET_SECURE) {
+            val key = strings[2]
+            if (key == Const.PROBE_KEY && isModuleCaller()) {
+                // 顺手按最新内容重读一次配置：框架的变更通知不保证送到被注入的进程，
+                // 模块 App 每次问探针就是一次"请按现在的配置重新判定"的机会。
+                runCatching { ConfigStore.forceReload() }
+                return probeBundle()
+            }
+        }
+
+        val result = chain.proceed()
         if (strings.size < 3) return result
         val authority = strings[0]
         val method = strings[1]
@@ -170,6 +194,44 @@ class FrameworkHooks(
         bundle.putInt(GENERATION_INDEX_KEY, -1)
         Diagnostics.reportFirstHit(caller, "GET_secure($key)")
         return bundle
+    }
+
+    // ------------------------------------------------------------ 自检探针
+
+    /**
+     * 只有模块自己能拿到探针的回答。
+     *
+     * 回答里包含"哪些包正在被隐藏"，那是模块的使用者自己的配置；任何第三方应用问一次就能
+     * 反推出模块是否存在、以及谁的隐藏状态被处理过。所以先确认调用方包名，不是模块就直接放行
+     * （让 SettingsProvider 按它自己的规则处理这个不存在的键）。
+     */
+    private fun isModuleCaller(): Boolean =
+        runCatching { PackageNames.callerPackages().any { it == Const.MODULE_PACKAGE } }.getOrDefault(false)
+
+    /**
+     * system_server 侧的自检回答：hook 装上了什么、当前生效的隐藏列表是什么、
+     * UID→包名解析走到了哪条路。
+     *
+     * 这些读数以前只有 root 才能从 logcat 里看到，而"界面显示的勾选"与"system_server 真正
+     * 执行的列表"是两回事——探针就是把后者交回给模块界面。
+     */
+    private fun probeBundle(): Bundle = Bundle().apply {
+        val caller = runCatching { PackageNames.callerPackageName() }.getOrNull() ?: "-"
+        val blocked = runCatching { ConfigStore.blockedSnapshot().sorted() }.getOrDefault(emptyList())
+        putString(
+            VALUE_KEY,
+            buildString {
+                append("hook=").append(installedNote).append('\n')
+                append("pid=").append(android.os.Process.myPid()).append('\n')
+                append("caller=").append(caller).append('\n')
+                append("blocked=").append(blocked.joinToString(",")).append('\n')
+                append("blockedSelf=").append(if (blocked.contains(Const.MODULE_PACKAGE)) "1" else "0").append('\n')
+                append("queries=").append(CallerGuard.queries.get()).append('\n')
+                append("hits=").append(CallerGuard.hits.get()).append('\n')
+                append("resolver=").append(PackageNames.resolutionPath)
+            },
+        )
+        putInt(GENERATION_INDEX_KEY, -1)
     }
 
     // ------------------------------------------------------------ 工具

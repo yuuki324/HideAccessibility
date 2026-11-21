@@ -10,19 +10,58 @@
     <string name="status_activated">模块已激活</string>
     <string name="status_not_activated">模块未激活（请在 LSPosed 中启用本模块，并勾选它推荐的作用域，然后重启）</string>
     <string name="status_scope_missing">模块已激活，但作用域里缺少「推荐作用域」那一项（名称随 LSPosed 版本不同，通常显示为「系统」）</string>
+    <!-- 框架服务能连上，但模块自己问无障碍仍然得到"开着"——说明 hook 根本没装上，
+         这时候报「已激活」就是假激活。 -->
+    <string name="status_self_check_failed">模块已连接框架，但自检未通过——hook 可能没有生效。请检查作用域是否勾选「系统」，以及启用后是否重启过手机。</string>
+    <!-- 框架服务连上了，但 system_server 对探针始终没有回应：模块没被加载进去
+         （或 Settings hook 没装上）。这是"显示已激活、所有应用却照样能检测到"最常见的原因。 -->
+    <string name="status_server_unreachable">模块已激活，但 system_server 没有回应——它很可能没有加载本模块。如果是在本次开机之后安装或更新的，请重启手机后再看。</string>
+    <string name="status_hook_failed">模块已激活、system_server 也有回应，但有一个或多个 hook 没装上。请复制下面的诊断信息反馈。</string>
     <string name="status_framework">运行框架：%1$s %2$s（API %3$d）</string>
     <string name="status_system">系统版本：%1$s</string>
     <string name="status_module">模块版本：%1$s</string>
+    <string name="label_server_state">system_server：%1$s</string>
+    <string name="server_loaded">已加载（pid %1$d）</string>
+    <string name="server_not_loaded">未加载——hook 没有回应</string>
     <!-- 模块是在本次开机之后安装/更新时显示。LSPosed 只在进程启动时加载模块，
          system_server 开机后常驻，所以必须重启才会用上新代码。 -->
     <string name="warning_need_reboot">⚠ 本模块是在本次开机之后安装/更新的，当前系统还没加载它。重启手机后才会生效。</string>
+    <!-- 同一种情况，但 system_server 里还在跑更新前的实例（探针有回答）。
+         重装 APK 只换了 App 侧代码，注入进 system_server 的那份要重启才会更新。 -->
+    <string name="warning_need_reboot_loaded">⚠ 本模块是在本次开机之后安装/更新的。system_server 里运行的仍是更新前的实例，它的隐藏列表和自检读数可能与当前界面不一致。重启手机后恢复同步。</string>
 
     <string name="button_manage_apps">管理被隐藏的应用</string>
     <string name="switch_hide_icon">隐藏桌面图标</string>
     <string name="link_project">项目主页</string>
     <string name="group_self_check">当前设备实际状态（自检用）</string>
-    <string name="label_accessibility_state">AccessibilityManager</string>
-    <string name="label_settings_secure">Settings.Secure</string>
+    <string name="label_accessibility_state">AccessibilityManager —— 应用查询无障碍状态的接口</string>
+    <string name="label_settings_secure">Settings.Secure —— 应用读取的那条系统设置</string>
+    <!-- 读的是真正执行隐藏的那一侧（system_server），而不是本应用问系统时被告知的内容。
+         两边对不上，才能把「配置没送到」和「hook 没生效」区分开。 -->
+    <string name="label_system_server_side">system_server 侧 —— 真正执行隐藏的那一侧（自检探针）</string>
+    <!-- 没有回应说明模块在 system_server 里的那条 Settings hook 没在跑：
+         要么模块没被加载（安装/更新 APK 后需要重启手机），要么 hook 安装失败。 -->
+    <string name="probe_no_answer">system_server 侧没有任何回应。\n\n这说明模块在 system_server 里的那条 Settings hook 没有在跑：要么模块没被加载（安装或更新 APK 后需要重启手机），要么 hook 安装失败。\n\n请点下面的「复制诊断信息」把文本发给开发者。</string>
+    <!-- 一个 hook 一行，后面直接写这个 hook 是干什么的：
+         即使不知道 addClient 是什么，也能看出是哪一层没装上。 -->
+    <string name="probe_hook_add_client">addClient: %1$s — 应用注册无障碍客户端时，系统会回「无障碍没开」</string>
+    <string name="probe_hook_service_list">getEnabledAccessibilityServiceList: %1$s — 应用查「已启用哪些无障碍服务」时回空列表</string>
+    <string name="probe_hook_transport">Transport.call: %1$s — 应用读 Settings.Secure 时把返回值改掉</string>
+    <string name="hook_status_ok">已装上</string>
+    <string name="hook_status_missing">方法没找到</string>
+    <string name="hook_status_failed">安装失败</string>
+    <string name="hook_status_class_missing">类没找到</string>
+    <string name="hook_status_unknown">未确认</string>
+    <string name="probe_pid">pid: %1$d — system_server 的进程号</string>
+    <string name="probe_blocked">生效的隐藏列表: %1$d 个 — system_server 里真正在拦的列表，不是界面上的勾选数</string>
+    <string name="probe_counters">queries/hits: %1$d / %2$d — hook 被调用 %1$d 次，其中 %2$d 次判定为要隐藏</string>
+    <string name="probe_resolver">包名解析: %1$s — UID 换包名走的入口</string>
+    <string name="probe_list_compare">隐藏列表：界面 %1$d 个 / system_server 生效 %2$d 个</string>
+    <string name="probe_list_out_of_sync">不一致——配置没有送达 system_server，安装/更新后请重启手机</string>
+    <string name="probe_line_raw">原始回答：</string>
+    <string name="button_copy_diagnostics">复制诊断信息</string>
+    <string name="diag_copied">诊断信息已复制到剪贴板</string>
+    <string name="diag_copy_failed">复制失败：%1$s</string>
 
     <!-- Keep the English word in EVERY translation of this label: if the app ever shows
          a language the user cannot read, "Language" is how they find their way back. -->

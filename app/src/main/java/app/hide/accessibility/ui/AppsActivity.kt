@@ -39,6 +39,7 @@ import android.widget.TextView
 import android.widget.Toast
 import app.hide.accessibility.R
 import app.hide.accessibility.data.ConfigStore
+import app.hide.accessibility.utils.Activation
 import app.hide.accessibility.utils.AppCatalog
 import app.hide.accessibility.utils.AppRow
 import java.util.concurrent.Executors
@@ -163,6 +164,9 @@ class AppsActivity : BaseActivity() {
         // write 返回 false = 只写进了本地兜底文件，system_server 读不到。
         // 这种情况必须明说，不能提示"已隐藏"却根本没生效。
         val delivered = ConfigStore.write(this, blocked) && ConfigStore.read(this).contains(row.packageName) == nowBlocked
+        // 再催 system_server 侧按最新内容重读一次：框架的变更通知不保证送到被注入的进程，
+        // 不催的话"界面里改了、实际拦截没变"会一直到下次打开主界面才自愈。
+        Activation.probeSystemSide(this)
         Toast.makeText(
             this,
             when {

@@ -20,7 +20,6 @@
 
 package app.hide.accessibility.hook
 
-import android.util.Log
 import io.github.libxposed.api.XposedInterface
 import io.github.libxposed.api.XposedModule
 import io.github.libxposed.api.XposedModuleInterface
@@ -54,11 +53,10 @@ class ModuleEntry : XposedModule() {
 
         // 配置通道与 hook 安装各自 try：配置读不到时仍要能报出"模块已加载 + hook 结果"
         var configNote = "ok via getRemotePreferences"
-        runCatching {
-            ConfigStore.listen(getRemotePreferences(Const.CONFIG_PREFS_NAME))
-        }.onFailure {
-            configNote = "FAILED ${it.javaClass.simpleName}: ${it.message}"
-            ModuleLog.e(Const.TAG, "remote preferences unavailable: ${it.message}")
+        // 传取用动作而不是现成实例：框架的变更通知若不送达，ConfigStore 还能自己重新取一次
+        if (!ConfigStore.listen { getRemotePreferences(Const.CONFIG_PREFS_NAME) }) {
+            configNote = "FAILED: remote preferences unavailable"
+            ModuleLog.e(Const.TAG, "remote preferences unavailable")
         }
 
         val hookResult = runCatching { FrameworkHooks(this, param.classLoader).install() }
