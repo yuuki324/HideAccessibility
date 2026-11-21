@@ -95,6 +95,23 @@ object PackageNames {
         cache.clear()
     }
 
+    /**
+     * 主动初始化解析器，不等第一个应用请求。
+     *
+     * [resolutionPath] 的初始值是 `"unresolved"`，只有第一次真正调用 [callerPackages] 时
+     * 才会去探两个 hidden API 入口。于是开机日志里永远先看到 `resolver=unresolved`，
+     * 排查时很容易把它误读成"解析坏了"——实际上只是"还没人问"。
+     *
+     * 在模块加载时主动探一次：成功会打出 `resolver ready via ...`，失败会打出
+     * `cannot resolve UID to package name; nothing will be hidden`。这样从开机日志
+     * 就能直接区分"没触发"和"真的用不了"。
+     *
+     * 这里只做类加载和反射绑定，不发起 Binder 调用，放在 system_server 启动阶段安全。
+     */
+    fun warmUp() {
+        packageManager()
+    }
+
     /** 诊断读数 */
     fun debugSnapshot(): String =
         "resolver=$resolutionPath\ncachedUids=${cache.size}" + (lastError?.let { "\nlastError=$it" } ?: "")

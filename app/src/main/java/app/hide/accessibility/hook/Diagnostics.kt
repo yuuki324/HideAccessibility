@@ -46,6 +46,9 @@ object Diagnostics {
         ModuleLog.i(TAG, "system_server loaded: pid=${android.os.Process.myPid()}")
         ModuleLog.i(TAG, "hooks: $hookResult")
         ModuleLog.i(TAG, "config: $configNote")
+        // 主动初始化 UID→包名解析器：否则要等第一个应用请求才会从 "unresolved" 变成
+        // 具体路径，开机日志里的 "resolver=unresolved" 很容易被误判成解析失败。
+        PackageNames.warmUp()
         ModuleLog.i(TAG, "blocked(${ConfigStore.blockedSnapshot().size}): ${ConfigStore.blockedSnapshot().sorted()}")
         ModuleLog.i(TAG, PackageNames.debugSnapshot())
     }
