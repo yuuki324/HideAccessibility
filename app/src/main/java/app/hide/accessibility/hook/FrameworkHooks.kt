@@ -268,9 +268,14 @@ class FrameworkHooks(
                     try {
                         body(chain)
                     } catch (t: Throwable) {
-                        // 兜底：拦截逻辑出错时退回原实现，绝不让异常冒到 framework
+                        // 记录后原样抛出，**不能**再调一次 chain.proceed()：
+                        //   - libxposed 的 PROTECTIVE 语义是"hooker 自身异常由框架吞掉并按没有 hook 继续"，
+                        //     不需要这里手动 proceed；
+                        //   - 而 proceed() 抛出的异常按文档必须原样传播给调用方。
+                        // 以前 catch 后又 proceed 一次，等于让原方法执行两遍：SettingsProvider 的
+                        // 写设置调用会因此重复抛 SecurityException，副作用也会发生两次。
                         ModuleLog.e(tag, "hook body failed for ${signatureOf(executable)}", t)
-                        chain.proceed()
+                        throw t
                     }
                 }
             ModuleLog.i(tag, "hooked ${signatureOf(executable)}")
